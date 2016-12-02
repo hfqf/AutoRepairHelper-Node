@@ -1,0 +1,19 @@
+/**
+ * Created by points on 16/11/15.
+ */
+var mongoose = require('mongoose');
+require('./model');
+var Setting = require('../utils/setting.js');
+
+var Car = mongoose.model(Setting.mongooseModelName);
+Car.findOne({author:'spe'},function (err,ret) {
+    if(err){
+        console.log('err:',err);
+        return;
+    }
+    ret.author = 'kaka';
+    ret.save();
+    console.log('result:',ret);
+});
+
+

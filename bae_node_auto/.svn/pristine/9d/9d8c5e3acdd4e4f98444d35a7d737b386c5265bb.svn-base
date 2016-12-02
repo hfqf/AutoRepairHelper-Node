@@ -1,0 +1,6 @@
+module.exports = {
+  cookieSecret:'123',
+  db:'auto',
+  host:'http://autorepairhelper.duapp.com/',
+  mongooseModelName:'CarSchema'
+};

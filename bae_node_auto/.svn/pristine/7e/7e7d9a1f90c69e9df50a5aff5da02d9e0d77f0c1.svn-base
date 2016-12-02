@@ -1,0 +1,72 @@
+var express = require('express');
+var router = express.Router();
+
+var mongoose = require('mongoose');
+var Setting = require('../utils/config.js');
+var User = mongoose.model(Setting.mongooseModelName);
+var Crypto = require('../utils/crypto');
+
+/* GET users listing. */
+router.get('/', function(req, res, next) {
+  res.send('respond with a resource');
+});
+
+//登录接口
+router.post('/login',function (req,res,next) {
+    var _name = req.body.username;
+    var _pwd  = req.body.pwd;
+    var _tel  = req.body.tel;
+    var _lev  = req.body.viplevel;
+
+    var cond = null;
+    if(_tel)
+    {
+         cond = {
+            //平等的条件
+            $or:[
+
+                {$and:
+                    [{username:_name},
+                        {pwd: _pwd}],
+                },
+                {$and:
+                    [{tel:tel},
+                        {pwd: _pwd}]
+                },
+            ]
+
+        };
+    }
+    else
+    {
+         cond = {
+             $and: [{username: _name}, {pwd: _pwd}],
+        };
+    }
+
+
+    User.findOne(cond,function (err,ret) {
+        if(err){
+            return res.send(global.retFormate(0,err,'查询失败'));
+        }else {
+            return res.send(global.retFormate(1, ret, '查询成功'));
+        }
+    });
+});
+
+
+router.get('/encrypt',function (req,res,next) {
+   var cry = new Crypto();
+    var para = req.query.pwd;
+    var ret = cry.encryptAuto(para);
+    res.end(ret);
+});
+
+router.get('/decrypt',function (req,res,next) {
+    var cry = new Crypto();
+    var para = req.query.pwd;
+    var ret = cry.decryptAuto(para);
+    res.end(ret);
+});
+
+module.exports = router;

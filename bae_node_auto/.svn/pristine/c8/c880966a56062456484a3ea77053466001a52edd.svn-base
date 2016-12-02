@@ -1,0 +1,20 @@
+/**
+ * Created by points on 16/11/15.
+ */
+var mongoose = require('mongoose');
+var Setting = require('../utils/setting.js');
+
+require('./model.js');
+
+var Car = mongoose.model(Setting.mongooseModelName);
+
+var car = new Car ({
+    name:'points',
+    author:'kaka',
+    publishTime:new Date()
+});
+
+car.save(function (err) {
+    console.log('save status:',err?'failed':'succeed');
+});
+

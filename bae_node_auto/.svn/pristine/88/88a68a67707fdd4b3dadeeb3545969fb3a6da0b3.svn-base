@@ -1,0 +1,50 @@
+/**
+ * Created by points on 16/11/19.
+ */
+
+//用来上传老版本本地数据的数据到服务器上
+
+var express = require('express');
+var router = express.Router();
+var mongoose = require('mongoose');
+
+var Contact = mongoose.model(global.config.ModelNameContact);
+var Repair = mongoose.model(global.config.ModelNameRepairHistory);
+
+//客户端把所有数据库记录弄成字串上传过来
+router.post('/contact',function (req, res, next) {
+
+        var  arrContact = JSON.parse(req.body.contact);
+       for(var i = 0 ; i < arrContact.length;i++){
+           var item = arrContact[i];
+
+           var newContact = new  Contact({
+               carcode:item.carcode,
+               name:item.name,
+               tel:item.tel,
+               cartype:item.cartype
+           });
+
+           newContact.save(function (err) {
+               if(err){
+                   return res.send(global.retFormate(0,err,'存入数据失败'));
+               }
+           });
+       }
+       return res.send(global.retFormate(1,'保存成功','存入数据成功'));
+});
+
+
+//客户端把所有数据库记录弄成字串上传过来
+router.post('/repair',function (req, res, next) {
+
+    var  arrRepair = JSON.parse(req.body.repair);
+    for(var item in arrRepair){
+
+        console.log(item);
+
+    }
+
+});
+
+module.exports = router;

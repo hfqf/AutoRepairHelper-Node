@@ -1,0 +1,22 @@
+/**
+ * Created by points on 16/11/15.
+ */
+
+var mongoose = require('mongoose');
+require('./model');
+var Setting = require('../utils/setting.js');
+
+var Car = mongoose.model(Setting.mongooseModelName);
+
+Car.findOne({
+                name:'points',
+            },function (err,doc) {
+        if(err){
+            console.log('find err:',err);
+            return;
+        }
+        if(doc){
+             doc.remove();
+         }
+    }
+);

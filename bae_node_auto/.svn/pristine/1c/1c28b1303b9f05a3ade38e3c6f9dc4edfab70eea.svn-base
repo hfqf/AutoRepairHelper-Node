@@ -1,0 +1,37 @@
+/**
+ * Created by points on 16/11/18.
+ */
+var express = require('express');
+var router = express.Router();
+var Setting = require('../utils/config');
+var mongoose = require('mongoose');
+var User = mongoose.model(Setting.mongooseModelName);
+
+//注册新用户
+router.post('/addNewUser',function (req,res,next) {
+        var name = req.body.username;
+        var pwd  = req.body.pwd;
+        var tel  = req.body.tel;
+        var lev  = req.body.viplevel;
+
+        var newUser = new  User({
+                username:name,
+                pwd:pwd,
+                tel:tel,
+                viplevel:lev
+            });
+
+
+
+
+        newUser.save(function (err) {
+            if(err){
+               return res.send(global.retFormate(0,err,'存入数据失败'));
+            }else {
+                return res.send(global.retFormate(1,'','存入数据成功'));
+            }
+        });
+    }
+);
+
+module.exports = router;

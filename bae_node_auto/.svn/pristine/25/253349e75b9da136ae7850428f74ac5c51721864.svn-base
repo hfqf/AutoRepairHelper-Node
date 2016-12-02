@@ -1,0 +1,13 @@
+/**
+ * Created by points on 16/11/15.
+ */
+var mongoose = require('mongoose');
+var Setting = require('../utils/config.js');
+
+var UserSchema = new  mongoose.Schema({
+        uid:Number,
+        userName:String,
+        createTime:Date,
+        lastLogin:Date,
+    });
+mongoose.model(Setting.mongooseModelName,UserSchema);

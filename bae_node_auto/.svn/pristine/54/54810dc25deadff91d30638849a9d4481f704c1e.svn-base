@@ -1,0 +1,16 @@
+/**
+ * Created by points on 16/11/15.
+ */
+var mongoose = require('mongoose');
+var uri = 'mongodb://localhost';
+var Setting = require('../utils/config.js');
+mongoose.connect(uri);
+
+var CarSchema = new mongoose.Schema({
+    name:String,
+    author:String,
+    publishTime:Date
+});
+
+mongoose.model(Setting.mongooseModelName,CarSchema);
+

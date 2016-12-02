@@ -1,0 +1,24 @@
+/**
+ * Created by points on 16/11/15.
+ */
+var mongoose = require('mongoose');
+require('./model');
+var Setting = require('../utils/setting.js');
+
+var Car = mongoose.model(Setting.mongooseModelName);
+
+var cond = {
+    //平等的条件
+    $and:[
+        {author:'kaka'},
+        {author:'messi'}
+    ]
+};
+
+Car.find(cond,function (err,ret) {
+    if(err){
+        console.log('err:',err);
+        return;
+    }
+    console.log('result:',ret);
+});
