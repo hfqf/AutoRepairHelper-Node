@@ -1,38 +1,18 @@
-<% if (!user) { %>
 <div class="hero-unit">
-  <h1>歡迎來到 Microblog</h1>
-  <p>Microblog 是一個基於 Node.js 的微博系統。</p>
+  <h1>欢迎使用 <%= title %></h1>
+  <p>这是一款提供给个人和小型汽修厂商管理客户和维修记录的小型工具</p>
   <p>
-    <a class="btn btn-primary btn-large" href="/login">登錄</a>
-    <a class="btn btn-large" href="/reg">立即註冊</a>
+    <a class="btn btn-primary btn-large" href="/login">登录</a>
+    <a class="btn btn-large" href="/reg">注册</a>
   </p>
 </div>
-<% } else { %>
-<form method="post" action="/post" class="well form-inline center" style="text-align:center;">
-  <input type="text" class="span8">
-  <button type="submit" class="btn btn-success"><i class="icon-comment icon-white"></i> 發言</button>
-</form>
-<% } %>
 
 <div class="row">
-  <div class="span4">
-    <h2>Carbo 說</h2>
-    <p>東風破早梅 向暖一枝開 氷雪無人見 春從天上來</p>
+  <div class="span5">
+    <p>1.完全免费,个人兴趣爱好</p>
+    <p>2.iOS,安卓和web端都有,一个账号可随意切换同步数据</p>
+    <p>3.更多功能尽情期待!</p>
+    <p>4.如有疑问可加群:485508197</p>
   </div>
-  <div class="span4">
-    <h2>BYVoid 說</h2>
-    <p>
-      Open Chinese Convert（OpenCC）是一個開源的中文簡繁轉換項目，
-      致力於製作高質量的基於統計預料的簡繁轉換詞庫。
-      還提供函數庫(libopencc)、命令行簡繁轉換工具、人工校對工具、詞典生成程序、
-      在線轉換服務及圖形用戶界面。</p>
-  </div>
-  <div class="span4">
-    <h2>佛振 說</h2>
-    <p>中州韻輸入法引擎 / Rime Input Method Engine 取意歷史上通行的中州韻，
-      願寫就一部彙集音韻學智慧的輸入法經典之作。
-      項目網站設在 http://code.google.com/p/rimeime/
-      創造應用價值是一方面，更要堅持對好技術的追求，希望能寫出靈動而易於擴展的代碼，
-      使其成為一款個性十足的開源輸入法。</p>
-  </div>
+
 </div>

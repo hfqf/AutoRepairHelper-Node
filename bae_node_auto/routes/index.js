@@ -3,13 +3,8 @@ var router = express.Router();
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-
-  var nowTime = new Date();
-
-  res.render('ok');
+  res.render('index', { title: '汽车修理小助手' });
 });
-
-
 
 
 

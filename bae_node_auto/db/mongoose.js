@@ -9,5 +9,6 @@ module.exports=function () {
     require('../models/user.server.model.js');
     require('../models/model.contact');
     require('../models/model.repair');
+    require('../models/model.noticeboard');
     return db;
 };

@@ -8,5 +8,6 @@ module.exports={
     mongooseModelName:"USER",
     ModelNameContact:"CONTACT",
     ModelNameRepairHistory:"RepairHistory",
+    ModelNameNoticeBoard:"noticeboard",
     cryptoKey:'704ec5d754d1433ca6317ec09e263cd4',
 };

@@ -68,4 +68,7 @@ console.log(krouky.name.first);//krouky
 
 
 
-mongoose.model(Setting.mongooseModelName,UserSchema);
+// mongoose.model(Setting.ModelNameContact,ContactSchema)
+//特别注意 **** 这些modelname在创建数据库表时的名字会自动增加s,并且都是小写。
+//下面的第三个参数设置表名
+mongoose.model(Setting.mongooseModelName,UserSchema,Setting.mongooseModelName);
