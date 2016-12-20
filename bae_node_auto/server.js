@@ -22,6 +22,7 @@ var users = require('./routes/users');
 var register = require('./routes/register');
 var async = require('./routes/async');
 var noticeboard = require('./routes/noticeboard');
+var push = require('./routes/push');
 
 
 var app = express();
@@ -29,6 +30,9 @@ var app = express();
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
+app.set('view options', {
+  layout: false
+});
 app.use(partials());
 
 // uncomment after placing your favicon in /public
@@ -38,7 +42,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-
+app.use(favicon(__dirname + '/public/favicon.ico'));
 
 
 
@@ -47,6 +51,7 @@ app.use('/users', users);
 app.use('/register', register);
 app.use('/async', async);
 app.use('/noticeboard', noticeboard);
+app.use('/push', push);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

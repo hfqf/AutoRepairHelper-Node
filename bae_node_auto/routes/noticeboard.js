@@ -12,9 +12,9 @@ router.get('/ios',function (req,res,next) {
 
     NoticeBoard.findOne({os:'ios'},function (err,ret) {
             if(err){
-                res.render('noticeboard', { value: '暂无数据!' ,layout: false});
+                res.render('noticeboard', { value: '暂无数据!' ,layout: 'noticeboard'});
             }else {
-                res.render('noticeboard', { value: ret.notice ,layout: false});
+                res.render('noticeboard', { value: ret.notice ,layout: 'noticeboard'});
             }
         });
 });
@@ -23,9 +23,9 @@ router.get('/android',function (req,res,next) {
 
     NoticeBoard.findOne({os:'android'},function (err,ret) {
         if(err){
-            res.render('noticeboard', { value: '暂无数据!' ,layout: false});
+            res.render('noticeboard', { value: '暂无数据!' ,layout: 'noticeboard'});
         }else {
-            res.render('noticeboard', { value: ret.notice ,layout: false});
+            res.render('noticeboard', { value: ret.notice ,layout: 'noticeboard'});
         }
     });
 });
