@@ -40,7 +40,7 @@ router.get('/android',function (req,res,next) {
     /**
      * 测试代码
      */
-    pushTest(req,res,next);
+
 
 });
 

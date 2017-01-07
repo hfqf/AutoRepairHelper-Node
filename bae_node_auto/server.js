@@ -8,6 +8,7 @@ var mongoose        = require('./db/mongoose');
 var db              = mongoose();
 var partials        = require('express-partials');
 
+
 global.config       = require('./utils/config');
 global.retFormate   = function (state,ret,msg) {
   var json = {'code' : state ,
@@ -23,6 +24,10 @@ var register = require('./routes/register');
 var async = require('./routes/async');
 var noticeboard = require('./routes/noticeboard');
 var push = require('./routes/push');
+var update = require('./routes/update');
+var contact = require('./routes/contact');
+var repair = require('./routes/repair');
+var prom =  require('./routes/prom');
 
 
 var app = express();
@@ -52,6 +57,10 @@ app.use('/register', register);
 app.use('/async', async);
 app.use('/noticeboard', noticeboard);
 app.use('/push', push);
+app.use('/update',update);
+app.use('/contact',contact);
+app.use('/repair',repair);
+app.use('/prom',prom);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -67,10 +76,11 @@ app.use(function(req, res, next) {
 if (app.get('env') === 'development') {
   app.use(function(err, req, res, next) {
     res.status(err.status || 500);
-    res.render('error', {
-      message: err.message,
-      error: err
-    });
+    // res.render('error', {
+    //   message: err.message,
+    //   error: err
+    // });
+      res.send('error');
   });
 }
 
@@ -78,10 +88,11 @@ if (app.get('env') === 'development') {
 // no stacktraces leaked to user
 app.use(function(err, req, res, next) {
   res.status(err.status || 500);
-  res.render('error', {
-    message: err.message,
-    error: {}
-  });
+    res.send('error');
+  // res.render('error', {
+  //   message: err.message,
+  //   error: {}
+  // });
 });
 
 

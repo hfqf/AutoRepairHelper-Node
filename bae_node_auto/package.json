@@ -4,7 +4,7 @@
     "author": "points",
     "description": "auto repaire helper",
     "scripts": {
-        "start": "node ./bin/start.js"
+        "start": "node  ./bin/start.js"
     },
     "dependencies": {
       "body-parser": "~1.13.2",
@@ -20,6 +20,8 @@
       "crypto-js":">=3.0.0",
       "crypto":">=0.0.1",
       "express-partials":">=0.0.1",
-      "jpush-sdk": "*"
+      "jpush-sdk": "*",
+      "async":"*",
+      "node-fetch":"*"
     }
 }

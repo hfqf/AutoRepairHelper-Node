@@ -5,15 +5,19 @@ var mongoose = require('mongoose');
 var Setting = require('../utils/config.js');
 
 var RepairSchema = new mongoose.Schema({
+    _id:String,
     carcode:String,
     totalkm:String,
     repairetime:String,
+    repairtype:String,
     addition:String,
     tipcircle:String,
     isclose:String,
     circle:String,
-    repairtype:String,
-    onwer:String,
+    isreaded:String,
+    owner:String,
+
+
 });
 
 // mongoose.model(Setting.ModelNameContact,ContactSchema)

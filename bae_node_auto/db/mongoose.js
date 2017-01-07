@@ -10,5 +10,6 @@ module.exports=function () {
     require('../models/model.contact');
     require('../models/model.repair');
     require('../models/model.noticeboard');
+    require('../models/model.update');
     return db;
 };
