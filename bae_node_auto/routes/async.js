@@ -4,14 +4,14 @@
 
 //用来上传老版本本地数据的数据到服务器上
 
-let express = require('express');
-let router = express.Router();
-let mongoose = require('mongoose');
+var express = require('express');
+var router = express.Router();
+var mongoose = require('mongoose');
 
-let Contact = mongoose.model(global.config.ModelNameContact);
-let Repair = mongoose.model(global.config.ModelNameRepairHistory);
+var Contact = mongoose.model(global.config.ModelNameContact);
+var Repair = mongoose.model(global.config.ModelNameRepairHistory);
 
-let async = require('async');
+var async = require('async');
 
 
 /**
@@ -23,11 +23,11 @@ let async = require('async');
 
 //客户端把所有数据库记录弄成字串上传过来
 router.post('/contact',function (req, res, next) {
-    let  arrContact = JSON.parse(req.body.contact);
+    var  arrContact = JSON.parse(req.body.contact);
 
     async.map(arrContact,function (item,callback) {
 
-        let newContact = new  Contact({
+        var newContact = new  Contact({
             carcode:item.carcode,
             name:item.name,
             tel:item.tel,
@@ -35,17 +35,31 @@ router.post('/contact',function (req, res, next) {
             owner:item.owner
         });
 
-        newContact.save(function (err,docs) {
-            if(err){
-                callback(err,1)
-            }else{
-                callback(null,docs);
-            }
+        //查看是否已有此人
+        Contact.findOne({tel:item.tel},function (err,doc) {
+                if(err){
+                    callback(err,1)
+                 }else {
+                     if(doc){
+                         callback(null,doc);
+                     }else {
+                         newContact.save(function (err,doc) {
+                             if(err){
+                                 callback(err,1)
+                             }else{
+                                 callback(null,doc);
+                             }
 
-        });
+                         });
+                     }
+                }
+             }
+        );
+
+
+
 
     },(e,v)=>{
-        "use strict";
         if(e){
             console.log(e);
             return res.send(global.retFormate(0,e,'存入数据失败'));
@@ -65,7 +79,8 @@ router.post('/contact',function (req, res, next) {
     var  arrRepair = JSON.parse(req.body.repair);
     async.map(arrRepair,function (item,callback) {
 
-        let newRepair = new  Repair({
+        var newRepair = new  Repair({
+            id:item.id,
             carcode:item.carcode,
             totalkm:item.totalkm,
             repairetime:item.repairetime,
@@ -77,17 +92,43 @@ router.post('/contact',function (req, res, next) {
             owner:item.owner
         });
 
-        newRepair.save(function (err,docs) {
-            if(err){
-                callback(err,1)
-            }else{
-                callback(null,docs);
-            }
+        if(item.id.length == 0){
+            newRepair.save(function (err,doc) {
+                if(err){
+                    callback(err,1)
+                }else{
+                    callback(null,doc);
+                }
 
-        });
+            });
+        }
+        else {
+            //先查看是否已保存过
+            Repair.findOne({_id:item.id},function (err,doc) {
+                if(err){
+                    callback(err,1)
+                }else {
+                    if(doc){
+                        callback(null,doc);
+                    }else {
+                        newRepair.save(function (err,doc) {
+                            if(err){
+                                callback(err,1)
+                            }else{
+                                callback(null,doc);
+                            }
+
+                        });
+                    }
+                }
+
+            });
+        }
+
+
+
 
     },(e,v)=>{
-        "use strict";
         if(e){
             console.log(e);
             return res.send(global.retFormate(0,e,'存入数据失败'));

@@ -5,7 +5,7 @@ var mongoose = require('mongoose');
 var Setting = require('../utils/config.js');
 
 var RepairSchema = new mongoose.Schema({
-    _id:String,
+    id:String,
     carcode:String,
     totalkm:String,
     repairetime:String,

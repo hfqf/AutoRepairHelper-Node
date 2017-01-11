@@ -17,6 +17,7 @@ var Repair = mongoose.model(global.config.ModelNameRepairHistory);
     router.post('/add',function (req, res, next) {
 
         var newRepair = new  Repair({
+            id:req.body.id,
             carcode:req.body.carcode,
             totalkm:req.body.totalkm,
             repairetime:req.body.repairetime,
@@ -28,12 +29,12 @@ var Repair = mongoose.model(global.config.ModelNameRepairHistory);
             owner:req.body.owner,
         });
 
-        newRepair.save(function (err) {
+        newRepair.save(function (err,doc) {
             if(err){
                 return res.send(global.retFormate(0,err,'存入数据失败'));
             }
             else {
-                return res.send(global.retFormate(1,'保存成功','存入数据成功'));
+                return res.send(global.retFormate(1,doc,'存入数据成功'));
             }
         });
 
@@ -45,7 +46,7 @@ var Repair = mongoose.model(global.config.ModelNameRepairHistory);
          * 删除某条记录
          * */
         router.post('/del',function (req, res, next) {
-            Contact.remove({_id:req.body.id,owner:req.body.owner,},function (err,ret) {
+            Repair.remove({_id:req.body.id,owner:req.body.owner,},function (err,ret) {
                 if(err){
                     return res.send(global.retFormate(0,err,'存入数据失败'));
                 }
@@ -60,9 +61,9 @@ var Repair = mongoose.model(global.config.ModelNameRepairHistory);
          * 删除当前用户的所有维修记录
          * */
         router.post('/delAll',function (req, res, next) {
-            Contact.remove({tel:req.body.tel,owner:req.body.owner,},function (err,ret) {
+            Repair.remove({tel:req.body.tel,owner:req.body.owner,},function (err,ret) {
                 if(err){
-                    return res.send(global.retFormate(0,err,'存入数据失败'));
+                    return res.send(global.retFormate(0,err,'保存数据失败'));
                 }
                 else {
                     return res.send(global.retFormate(1,'保存成功','存入数据成功'));
@@ -88,7 +89,7 @@ var Repair = mongoose.model(global.config.ModelNameRepairHistory);
                 repairtype:req.body.repairtype,
             }};
             var options    = {upsert : true};
-            Contact.update(conditions,update,options,function (err,ret) {
+            Repair.update(conditions,update,options,function (err,ret) {
                 if(err){
                     return res.send(global.retFormate(0,err,'修改数据失败'));
                 }
@@ -99,4 +100,20 @@ var Repair = mongoose.model(global.config.ModelNameRepairHistory);
 
         }),
 
+
+        /**
+         * 查询所有记录
+         **/
+        router.post('/queryAll',function (req, res, next) {
+            var conditions = {owner:req.body.owner};
+            Repair.find(conditions,function (err,ret) {
+                if(err){
+                    return res.send(global.retFormate(0,err,'查询数据失败'));
+                }
+                else {
+                    return res.send(global.retFormate(1,ret,'查询数据成功'));
+                }
+            });
+
+        }),
         module.exports = router;
