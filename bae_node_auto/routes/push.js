@@ -7,40 +7,29 @@ var Setting = require('../utils/config');
 var mongoose = require('mongoose');
 var JPush = require("jpush-sdk");
 var client = JPush.buildClient(Setting.JPush.JPushAppKey, Setting.JPush.JPushMasterSecret);
-
-
-  function pushTest (req,httpRes,next) {
-        client.push().setPlatform(JPush.ALL)
-            .setAudience(JPush.ALL)
-            .setNotification('Hi, JPush', JPush.ios('ios alert', 'happy', 5))
-            .send(function(err, res) {
-                if (err) {
-                    console.log(err.message)
-                    httpRes.send('ok');
-                } else {
-                    console.log('Sendno: ' + res.sendno)
-                    console.log('Msg_id: ' + res.msg_id)
-                    httpRes.send('ok');
-                }
-            });
-};
-
+var root = require('../bin/start');
 
 router.get('/ios',function (req,res,next) {
 
-    /**
-     * 测试代码
-     */
-    pushTest(req,res,next);
+    root.pushTest(function (err, docs) {
+        if(err){
+            res.send(err);
 
+        }else {
+            res.send(docs);
+        }
+    });
 });
 
 router.get('/android',function (req,res,next) {
 
-    /**
-     * 测试代码
-     */
+    root.pushTest(function (err, docs) {
+        if(err){
+            res.send(err);
 
+        }else {
+            res.send(docs);
+        }    });
 
 });
 

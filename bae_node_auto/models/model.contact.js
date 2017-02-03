@@ -10,6 +10,7 @@ var ContactSchema = new mongoose.Schema({
     tel:String,
     cartype:String,
     owner:String,
+    id:String,
 });
 
 // mongoose.model(Setting.ModelNameContact,ContactSchema)

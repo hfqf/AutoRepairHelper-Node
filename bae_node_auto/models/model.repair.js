@@ -16,8 +16,7 @@ var RepairSchema = new mongoose.Schema({
     circle:String,
     isreaded:String,
     owner:String,
-
-
+    inserttime:String,
 });
 
 // mongoose.model(Setting.ModelNameContact,ContactSchema)

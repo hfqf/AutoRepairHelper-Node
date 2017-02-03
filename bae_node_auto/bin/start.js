@@ -7,7 +7,12 @@
 var app = require('../server.js');
 var http = require('http');
 var config = require('../utils/config');
-
+var CronJob = require('cron').CronJob;
+var JPush = require("jpush-sdk");
+var client = JPush.buildClient(config.JPush.JPushAppKey, config.JPush.JPushMasterSecret);
+var mongoose = require('mongoose');
+var User = mongoose.model(config.mongooseModelName);
+var Repair = mongoose.model(config.ModelNameRepairHistory);
 
 /**
  * Get port from environment and store in Express.
@@ -90,6 +95,121 @@ function onListening() {
   var nowTime = new Date();
   console.error('Listening on ' + bind+nowTime);
 
+  //开始定时器
+  startPush();
+
 
 
 }
+
+
+/**
+ * 根据用户获取未读数，再生成个性化推送提示语
+ * @param user
+ */
+function pushNoti(user) {
+    getUnreadCount(user,function (err,count) {
+        // if(count > 0){
+        if(user.tel == '13813313631' || user.tel == '18251846048' ){
+            if(user.ostype == 'ios') {
+                client.push().setPlatform('ios')
+                    .setAudience(JPush.registration_id([user.pushid]))
+                    .setNotification('今天您有'+count+'条到期维修记录,快去看看吧', JPush.ios('今天您有'+count+'条到期维修记录,快去看看吧', '今天您有'+count+'条到期维修记录,快去看看吧', count))
+                    .send(function(err, res) {
+                        if (err) {
+                            console.log(err.message)
+                        } else {
+                            console.log('Sendno: ' + res.sendno)
+                            console.log('Msg_id: ' + res.msg_id)
+                        }
+                    });
+            }else {
+                client.push().setPlatform('android')
+                    .setAudience(JPush.registration_id([user.pushid]))
+                    .setNotification('今天您有'+count+'条到期维修记录,快去看看吧', JPush.ios('今天您有'+count+'条到期维修记录,快去看看吧', '今天您有'+count+'条到期维修记录,快去看看吧', count))
+                    .send(function(err, res) {
+                        if (err) {
+                            console.log(err.message)
+                        } else {
+                            console.log('Sendno: ' + res.sendno)
+                            console.log('Msg_id: ' + res.msg_id)
+                        }
+                    });
+            }
+        }
+    });
+
+
+
+};
+
+function startPush () {
+
+    //类似闹钟,每天早晨定时推送维修到期提醒
+    var job = new CronJob({
+        cronTime: config.pushTime,
+        onTick: function() {
+
+
+                User.find({},function (err,docs) {
+
+                    if(err){
+
+                    }
+                    else {
+                        for(var i = 0 ;i<docs.length;i++){
+                            var user = docs[i];
+                           pushNoti(user);
+                        }
+                    }
+                });
+        },
+        start: true,
+        timeZone: 'Asia/Shanghai'
+    });
+
+
+}
+
+/**
+ * 获取当前用户的维修到期记录数量
+ * @param user
+ */
+function getUnreadCount(user,callback) {
+    
+    Repair.find({
+        owner:user.tel,
+        isclose : '0',
+        tipcircle:{'$lte': Date.now}
+    },function (err,doc) {
+
+        console.log('getUnreadCount'+doc);
+        if(err){
+            return callback(err,0);
+        }else {
+            return callback(null,doc.length);
+        }
+    })
+
+}
+
+/**
+ * 测试
+ */
+function pushTest(callback) {
+    User.find({},function (err,docs) {
+
+        if(err){
+            callback(err,docs);
+        }
+        else {
+            callback(null,docs);
+            for(var i = 0 ;i<docs.length;i++){
+                var user = docs[i];
+                pushNoti(user);
+            }
+        }
+    });
+}
+
+exports.pushTest = pushTest;

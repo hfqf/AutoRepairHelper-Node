@@ -33,4 +33,49 @@ router.post('/addNewUser',function (req,res,next) {
     }
 );
 
+//注册新用户
+router.post('/addNewUser2',function (req,res,next) {
+        var name = req.body.username;
+        var pwd  = req.body.pwd;
+        var tel  = req.body.tel;
+        var lev  = req.body.viplevel;
+        var udid  = req.body.udid;
+        var ostype  = req.body.ostype;
+        var version  = req.body.version;
+
+        var newUser = new  User({
+            username:name,
+            pwd:pwd,
+            tel:tel,
+            viplevel:lev,
+            udid:udid,
+            ostype:ostype,
+            version:version
+        });
+
+    User.findOne({tel:tel},function (err,doc) {
+            if(err){
+                return res.send(global.retFormate(0,err,'存入数据失败'));
+            }
+            else{
+                if(doc){
+                    return res.send(global.retFormate(0,'此号码已被注册','此号码已被注册'));
+                }
+                else{
+                    newUser.save(function (err) {
+                        if(err){
+                            return res.send(global.retFormate(0,err,'存入数据失败'));
+                        }else {
+                            return res.send(global.retFormate(1,'','存入数据成功'));
+                        }
+                    });
+                }
+            }
+        }
+
+    );
+
+    }
+);
+
 module.exports = router;

@@ -15,5 +15,5 @@ module.exports={
         JPushAppKey:'2c333bb853fee953412917d3',
         JPushMasterSecret:'78b67cb91bdd80f8c0fa92a9',
     },
-
+    pushTime:'00 00 09 * * *',//类似闹钟,定时发送
 };

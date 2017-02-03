@@ -10,7 +10,12 @@ var UserSchema = new  mongoose.Schema({
         tel:String,
         viplevel:String,
         udid:String,
-        devicemodifyed:{type:String,default:'0'}
+        devicemodifyed:{type:String,default:'0'},
+        ostype:String,
+        version:String,
+        pushid:String,
+       //2.1所加,确认当前设备是否因为版本升级同步数据时，要先删除本地数据库数据
+        needasnc:{type:String,default:'0'},
 });
 
 //实例方法

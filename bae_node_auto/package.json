@@ -16,12 +16,13 @@
       "serve-favicon": "~2.3.0",
       "mongodb": ">= 0.9.9",
       "connect-mongo": ">= 0.1.7",
-      "mongoose":"~4.1.0",
+      "mongoose":"*",
       "crypto-js":">=3.0.0",
       "crypto":">=0.0.1",
       "express-partials":">=0.0.1",
       "jpush-sdk": "*",
       "async":"*",
-      "node-fetch":"*"
+      "node-fetch":"*",
+      "cron":"*"
     }
 }

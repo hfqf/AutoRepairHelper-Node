@@ -15,25 +15,39 @@ var Contact = mongoose.model(global.config.ModelNameContact);
  */
 router.post('/add',function (req, res, next) {
 
-           var newContact = new  Contact({
-               carcode:req.body.carcode,
-               name:req.body.name,
-               tel:req.body.tel,
-               cartype:req.body.cartype,
-               owner:req.body.owner,
-           });
+    var newContact = new  Contact({
+        carcode:req.body.carcode,
+        name:req.body.name,
+        tel:req.body.tel,
+        cartype:req.body.cartype,
+        owner:req.body.owner,
+    });
 
-           newContact.save(function (err) {
-               if(err){
-                   return res.send(global.retFormate(0,err,'存入数据失败'));
-               }
-               else {
-                   return res.send(global.retFormate(1,'保存成功','存入数据成功'));
-               }
-           });
+    //插入新联系人之前先要检查是否已经记录过,根据号码，车牌号，登录的用户
+    Contact.findOne({tel:req.body.tel,carcode:req.body.carcode,owner:req.body.owner},function (err,doc) {
+            if(err){
+                return res.send(global.retFormate(0,err,'存入数据失败'));
+            }
+            else {
+                if(doc){
+                    return res.send(global.retFormate(0,'已存在此记录','已存在此记录'));
+                }else {
+                    newContact.save(function (err) {
+                        if(err){
+                            return res.send(global.retFormate(0,err,'存入数据失败'));
+                        }
+                        else {
+                            return res.send(global.retFormate(1,'保存成功','存入数据成功'));
+                        }
+                    });
+                }
+
+                }
+            }
+    );
+
 
 }),
-
 
 
     /**
@@ -51,16 +65,55 @@ router.post('/add',function (req, res, next) {
 
     }),
 
+
+    /**
+     * 删除客户2.0
+     * */
+    router.post('/del2',function (req, res, next) {
+        Contact.remove({_id:req.body.id},function (err,ret) {
+            if(err){
+                return res.send(global.retFormate(0,err,'存入数据失败'));
+            }
+            else {
+                return res.send(global.retFormate(1,'保存成功','存入数据成功'));
+            }
+        });
+
+    }),
+
     /**
      *更新客户
      **/
     router.post('/update',function (req, res, next) {
         var conditions = {tel : req.body.tel,owner:req.body.owner};
         var update     = {$set : {
-                                carcode:req.body.carcode,
-                                name:req.body.name,
-                                cartype:req.body.cartype,
-                                }};
+            carcode:req.body.carcode,
+            name:req.body.name,
+            cartype:req.body.cartype,
+        }};
+        var options    = {upsert : true};
+        Contact.update(conditions,update,options,function (err,ret) {
+            if(err){
+                return res.send(global.retFormate(0,err,'修改数据失败'));
+            }
+            else {
+                return res.send(global.retFormate(1,'修改成功','修改数据成功'));
+            }
+        });
+
+    }),
+
+    /**
+     *更新客户2.0
+     **/
+    router.post('/update2',function (req, res, next) {
+        var conditions = {id : req.body.id};
+        var update     = {$set : {
+            carcode:req.body.carcode,
+            name:req.body.name,
+            cartype:req.body.cartype,
+            tel : req.body.tel
+        }};
         var options    = {upsert : true};
         Contact.update(conditions,update,options,function (err,ret) {
             if(err){
@@ -90,4 +143,4 @@ router.post('/add',function (req, res, next) {
     }),
 
 
-module.exports = router;
+    module.exports = router;

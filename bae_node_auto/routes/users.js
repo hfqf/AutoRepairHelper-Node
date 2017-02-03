@@ -6,56 +6,188 @@ var Setting = require('../utils/config.js');
 var User = mongoose.model(Setting.mongooseModelName);
 var Crypto = require('../utils/crypto');
 
-//登录接口
-router.post('/login',function (req,res,next) {
-    var _name = req.body.username;
+/**
+ * 2.0登录接口
+ */
+router.post('/login2',function (req,res,next) {
+    var _tel = req.body.username;
     var _pwd  = req.body.pwd;
     var _udid  = req.body.udid;
     var  cond = {
             //平等的条件
             $or:[
                 {$and:
-                    [{username:_name},
+                    [{username:_tel},
                         {pwd: _pwd}],
                 },
                 {$and:
-                    [{tel:_name},
+                    [{tel:_tel},
                         {pwd: _pwd}]
                 },
             ]
         };
-
+    var _version = req.body.version;
+    var _ostype  = req.body.ostype;
+    var _pushid  = req.body.pushid;
+    var _isfirst  = req.body.isfirstlogin;
     User.findOne(cond,function (err,ret) {
-        if(err){
-            return res.send(global.retFormate(0,err,'查询失败'));
-        }else {
-            User.update(cond,{$set:{udid:_udid}},function(err,updateRet){
-                if(err){
-                    return res.send(global.retFormate(0, updateRet, '更新udid失败'));
-                }else {
+            if(err){
+                return res.send(global.retFormate(0,err,'登录失败'));
+            }else {
 
-                    if(ret.udid){
-                        if(ret.udid === _udid) {
+
+
+                //发现已有此用户，只不过是老版的字段，需要删除当前记录，并插入最新数据字段记录
+                if(ret){
+
+                    //默认是不需要同步数据
+                    ret.needasnc = '0';
+
+                    var _name = ret.username;
+                    var _viplevel = ret.viplevel;
+                    //老版本的用户
+                    if(ret.version == undefined){
+                        User.remove({tel:_tel},function (err,ret) {
+                            if(err){
+                                return res.send(global.retFormate(0,err,'登录失败'));
+                            }
+                            else {
+
+                                var newModifyUser = new  User({
+                                    username:_name,
+                                    pwd:_pwd,
+                                    tel:_tel,
+                                    viplevel:_viplevel,
+                                    udid:_udid,
+                                    version:_version,
+                                    ostype:_ostype,
+                                    pushid:_pushid
+                                });
+
+                                newModifyUser.save(function (err,ret) {
+                                    if(err){
+                                        return res.send(global.retFormate(0,err,'存入数据失败'));
+                                    }else {
+                                        ret.devicemodifyed = '1';//因为版本数据不一致,强制数据更新
+                                        return res.send(global.retFormate(1, ret, '查询成功'));
+                                    }
+                                });
+
+                            }
+                        });
+                    }else {//新版本用户
+
+                        //TODO 等build14上线后，再升级的版本需要根据version的变化确定
+                        User.update(cond,{$set:{udid:_udid,
+                                version:_version,
+                                ostype:_ostype,
+                                pushid:_pushid}
+                            },
+                            function(err,updateRet){
+                                if(err){
+                                    return res.send(global.retFormate(0, updateRet, '更新udid失败'));
+                                }else {
+
+
+                                    if(ret.udid){
+                                        if(ret.udid === _udid) {
+                                            //2.0以上版本的同一部手机，因为版本升级导致需要删除本地数据,全部同步成服务器的数据。
+                                            if(_isfirst == '1'){
+                                                ret.needasnc = '1';
+                                                ret.devicemodifyed = '0';
+                                                return res.send(global.retFormate(1, ret, '查询成功'));
+                                            }else {
+                                                ret.devicemodifyed = '0';
+                                                return res.send(global.retFormate(1, ret, '查询成功'));
+                                            }
+
+                                        }else {
+                                            ret.devicemodifyed = '1';
+                                            return res.send(global.retFormate(1, ret, '查询成功'));
+                                        }
+                                    }else {
+                                        ret.devicemodifyed = '0';
+                                        return res.send(global.retFormate(1, ret, '查询成功'));
+                                    }
+                                }
+                            });
+
+
+                    }
+
+                }else{
+
+                    return res.send(global.retFormate(0, '用户名或密码错误', '用户名或密码错误'));
+
+                }
+
+            }
+        });
+
+
+
+});
+
+
+
+
+/**
+ * 1.0登录接口
+ * //TODO 等build14上线后,直接提示升级新版,此接口废弃
+ */
+router.post('/login',function (req,res,next) {
+    var _tel = req.body.username;
+    var _pwd  = req.body.pwd;
+    var _udid  = req.body.udid;
+    var  cond = {
+        //平等的条件
+        $or:[
+            {$and:
+                [{username:_tel},
+                    {pwd: _pwd}],
+            },
+            {$and:
+                [{tel:_tel},
+                    {pwd: _pwd}]
+            },
+        ]
+    };
+    var version =  req.body.version;
+    var ostype =  req.body.ostype;
+    User.findOne(cond,function (err,ret) {
+            if(err){
+                return res.send(global.retFormate(0,err,'查询失败'));
+            }else {
+                User.update(cond,{$set:{udid:_udid}},function(err,updateRet){
+                    if(err){
+                        return res.send(global.retFormate(0, updateRet, '更新udid失败'));
+                    }else {
+
+                        if(ret.udid){
+                            if(ret.udid === _udid) {
+                                ret.devicemodifyed = '0';
+                                return res.send(global.retFormate(1, ret, '查询成功'));
+                            }else {
+                                ret.devicemodifyed = '1';
+                                return res.send(global.retFormate(1, ret, '查询成功'));
+                            }
+                        }else {
                             ret.devicemodifyed = '0';
                             return res.send(global.retFormate(1, ret, '查询成功'));
-                        }else {
-                            ret.devicemodifyed = '1';
-                            return res.send(global.retFormate(1, ret, '查询成功'));
                         }
-                    }else {
-                        ret.devicemodifyed = '0';
-                        return res.send(global.retFormate(1, ret, '查询成功'));
                     }
-                }
-            });
-        }
-    });
+                });
+            }
+     });
+
+
+
 });
+
 
 
 //修改密码
 router.post('/resetPwd',function (req,res,next) {
-
 
 
 });
