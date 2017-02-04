@@ -30,14 +30,14 @@ router.post('/add',function (req, res, next) {
             }
             else {
                 if(doc){
-                    return res.send(global.retFormate(0,'已存在此记录','已存在此记录'));
+                    return res.send(global.retFormate(0,doc,'已存在此记录'));
                 }else {
-                    newContact.save(function (err) {
+                    newContact.save(function (err,newdoc) {
                         if(err){
                             return res.send(global.retFormate(0,err,'存入数据失败'));
                         }
                         else {
-                            return res.send(global.retFormate(1,'保存成功','存入数据成功'));
+                            return res.send(global.retFormate(1,newdoc,'存入数据成功'));
                         }
                     });
                 }

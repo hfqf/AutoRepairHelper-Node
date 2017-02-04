@@ -14,10 +14,12 @@ var mongoose = require('mongoose');
 var User = mongoose.model(config.mongooseModelName);
 var Repair = mongoose.model(config.ModelNameRepairHistory);
 
+
 /**
  * Get port from environment and store in Express.
  */
 var port = config.port;
+
 app.set('port', port);
 
 /**
@@ -109,8 +111,7 @@ function onListening() {
  */
 function pushNoti(user) {
     getUnreadCount(user,function (err,count) {
-        // if(count > 0){
-        if(user.tel == '13813313631' || user.tel == '18251846048' ){
+         if(parseInt(count) > 0){
             if(user.ostype == 'ios') {
                 client.push().setPlatform('ios')
                     .setAudience(JPush.registration_id([user.pushid]))
@@ -211,5 +212,6 @@ function pushTest(callback) {
         }
     });
 }
+
 
 exports.pushTest = pushTest;

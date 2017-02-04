@@ -158,25 +158,26 @@ router.post('/login',function (req,res,next) {
             if(err){
                 return res.send(global.retFormate(0,err,'查询失败'));
             }else {
-                User.update(cond,{$set:{udid:_udid}},function(err,updateRet){
-                    if(err){
-                        return res.send(global.retFormate(0, updateRet, '更新udid失败'));
-                    }else {
-
-                        if(ret.udid){
-                            if(ret.udid === _udid) {
-                                ret.devicemodifyed = '0';
-                                return res.send(global.retFormate(1, ret, '查询成功'));
-                            }else {
-                                ret.devicemodifyed = '1';
-                                return res.send(global.retFormate(1, ret, '查询成功'));
-                            }
-                        }else {
-                            ret.devicemodifyed = '0';
-                            return res.send(global.retFormate(1, ret, '查询成功'));
-                        }
-                    }
-                });
+                return res.send(global.retFormate(0, '登录失败,需要升级新版本', '登录失败,需要升级新版本'));
+                // User.update(cond,{$set:{udid:_udid}},function(err,updateRet){
+                //     if(err){
+                //         return res.send(global.retFormate(0, updateRet, '更新udid失败'));
+                //     }else {
+                //
+                //         if(ret.udid){
+                //             if(ret.udid === _udid) {
+                //                 ret.devicemodifyed = '0';
+                //                 return res.send(global.retFormate(1, ret, '查询成功'));
+                //             }else {
+                //                 ret.devicemodifyed = '1';
+                //                 return res.send(global.retFormate(1, ret, '查询成功'));
+                //             }
+                //         }else {
+                //             ret.devicemodifyed = '0';
+                //             return res.send(global.retFormate(1, ret, '查询成功'));
+                //         }
+                //     }
+                // });
             }
      });
 

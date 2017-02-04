@@ -221,7 +221,7 @@ router.post('/contact',function (req, res, next) {
                 circle:item.circle,
                 isreaded:item.isreaded == undefined ? '' : item.isreaded,
                 owner:item.owner == undefined ? '' : item.owner,
-                inserttime:item.inserttime == undefined ? new Date().Format('yyyy-MM-dd hh:mm:ss') : item.inserttime
+                inserttime:(item.inserttime == undefined || item.inserttime.length < 10) ? new Date().Format('yyyy-MM-dd hh:mm:ss') : item.inserttime
             });
 
             if(item.id.length == 0){
