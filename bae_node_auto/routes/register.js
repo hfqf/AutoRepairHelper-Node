@@ -49,8 +49,11 @@ router.post('/addNewUser2',function (req,res,next) {
             tel:tel,
             viplevel:lev,
             udid:udid,
+            devicemodifyed:'0',
             ostype:ostype,
-            version:version
+            version:version,
+            pushid:'',
+            needasnc:'0',
         });
 
     User.findOne({tel:tel},function (err,doc) {
@@ -62,11 +65,11 @@ router.post('/addNewUser2',function (req,res,next) {
                     return res.send(global.retFormate(0,'此号码已被注册','此号码已被注册'));
                 }
                 else{
-                    newUser.save(function (err) {
+                    newUser.save(function (err,newdoc) {
                         if(err){
                             return res.send(global.retFormate(0,err,'存入数据失败'));
                         }else {
-                            return res.send(global.retFormate(1,'','存入数据成功'));
+                            return res.send(global.retFormate(1,newdoc,'存入数据成功'));
                         }
                     });
                 }

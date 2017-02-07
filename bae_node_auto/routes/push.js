@@ -5,11 +5,8 @@ var express = require('express');
 var router = express.Router();
 var Setting = require('../utils/config');
 var mongoose = require('mongoose');
-var JPush = require("jpush-sdk");
-var client = JPush.buildClient(Setting.JPush.JPushAppKey, Setting.JPush.JPushMasterSecret);
 var root = require('../bin/start');
 
-var logger = require('../utils/logger4js');
 router.get('/ios',function (req,res,next) {
 
     root.pushTest(function (err, docs) {
@@ -36,8 +33,6 @@ router.get('/android',function (req,res,next) {
 
 
 router.get('/log',function (req,res,next) {
-
-    logger.log(new  Date());
 
     res.send('ok');
 

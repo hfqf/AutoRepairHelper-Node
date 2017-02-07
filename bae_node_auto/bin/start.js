@@ -111,9 +111,29 @@ function onListening() {
  */
 function pushNoti(user) {
     getUnreadCount(user,function (err,count) {
-         if(parseInt(count) > 0){
-            if(user.ostype == 'ios') {
+        if(err){
+            console.log('getUnreadCount:error'+err);
+            return;
+        }
+        var finalCount = 0;
+
+        if(typeof count ==  'string'){
+            finalCount =  parseInt(count);
+        }else if(typeof count == 'number' ){
+            finalCount = count;
+        }else {
+            console.log('undefined');
+        }
+
+        if(finalCount > 0){
+            console.log(user);
+            //防止老用户的过期提醒
+            if(user.ostype == undefined){
+                return;
+            }
+            if(user.ostype == 'ios' ) {
                 client.push().setPlatform('ios')
+                    .setOptions(null,null,null,config.JPush_IS_Production,null)
                     .setAudience(JPush.registration_id([user.pushid]))
                     .setNotification('今天您有'+count+'条到期维修记录,快去看看吧', JPush.ios('今天您有'+count+'条到期维修记录,快去看看吧', '今天您有'+count+'条到期维修记录,快去看看吧', count))
                     .send(function(err, res) {
@@ -177,14 +197,15 @@ function startPush () {
  * @param user
  */
 function getUnreadCount(user,callback) {
-    
+    var now = new Date().Format("yyyy-MM-dd");
     Repair.find({
         owner:user.tel,
         isclose : '0',
-        tipcircle:{'$lte': Date.now}
+        tipcircle:{'$lte':now}
     },function (err,doc) {
 
-        console.log('getUnreadCount'+doc);
+        console.log('getUnreadCount:count'+doc.length);
+        console.log('getUnreadCount:doc'+doc.toString());
         if(err){
             return callback(err,0);
         }else {
