@@ -8,6 +8,7 @@ var mongoose        = require('./db/mongoose');
 var db              = mongoose();
 var partials        = require('express-partials');
 
+var log_bae = require('./utils/logger4js');
 
 global.config       = require('./utils/config');
 global.retFormate   = function (state,ret,msg) {
@@ -15,7 +16,16 @@ global.retFormate   = function (state,ret,msg) {
     'msg'  : msg,
     'ret'  : ret
   };
-  return JSON.stringify(json);
+
+    global.log4bae(JSON.stringify(json));
+    return JSON.stringify(json);
+};
+global.log4bae         = function (msg) {
+    log_bae.log(msg);
+};
+
+global.logError4bae    = function (msg) {
+    log_bae.errBae(msg);
 };
 
 var index = require('./routes/index');
@@ -28,6 +38,7 @@ var update = require('./routes/update');
 var contact = require('./routes/contact');
 var repair = require('./routes/repair');
 var prom =  require('./routes/prom');
+var ocr = require('./routes/baiduocr');
 
 
 var app = express();
@@ -57,6 +68,7 @@ app.use('/update',update);
 app.use('/contact',contact);
 app.use('/repair',repair);
 app.use('/prom',prom);
+app.use('/ocr',ocr);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -76,6 +88,8 @@ if (app.get('env') === 'development') {
     //   message: err.message,
     //   error: err
     // });
+      console.error(err);
+      global.logError4bae(err.message.toString());
       res.send(err);
   });
 }
@@ -84,6 +98,7 @@ if (app.get('env') === 'development') {
 // no stacktraces leaked to user
 app.use(function(err, req, res, next) {
   res.status(err.status || 500);
+    console.error(err);
     res.send(err);
   // res.render('error', {
   //   message: err.message,

@@ -6,6 +6,7 @@ var router = express.Router();
 var Setting = require('../utils/config');
 var mongoose = require('mongoose');
 var root = require('../bin/start');
+var log_bae = require('../utils/logger4js');
 
 router.get('/ios',function (req,res,next) {
 
@@ -35,6 +36,7 @@ router.get('/android',function (req,res,next) {
 router.get('/log',function (req,res,next) {
 
     res.send('ok');
+    log_bae.log('hi!');
 
 });
 

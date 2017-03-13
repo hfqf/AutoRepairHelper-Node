@@ -15,7 +15,7 @@ var Repair = mongoose.model(global.config.ModelNameRepairHistory);
      * 增加记录
      */
     router.post('/add',function (req, res, next) {
-
+        global.log4bae('repair/add'+JSON.stringify(req.body));
         var newRepair = new  Repair({
             id:req.body.id,
             carcode:req.body.carcode,
@@ -45,6 +45,7 @@ var Repair = mongoose.model(global.config.ModelNameRepairHistory);
          * 增加记录2.0
          */
         router.post('/add2',function (req, res, next) {
+            global.log4bae('repair/add2'+JSON.stringify(req.body));
             var newRepair = new  Repair({
                 id:req.body.id,
                 carcode:req.body.carcode,
@@ -77,6 +78,7 @@ var Repair = mongoose.model(global.config.ModelNameRepairHistory);
          * 删除某条记录
          * */
         router.post('/del',function (req, res, next) {
+            global.log4bae('repair/del'+JSON.stringify(req.body));
             Repair.remove({_id:req.body.id,owner:req.body.owner,},function (err,ret) {
                 if(err){
                     return res.send(global.retFormate(0,err,'存入数据失败'));
@@ -92,6 +94,7 @@ var Repair = mongoose.model(global.config.ModelNameRepairHistory);
          * 删除当前用户的所有维修记录
          * */
         router.post('/delAll',function (req, res, next) {
+            global.log4bae('repair/delAll'+JSON.stringify(req.body));
             Repair.remove({carcode:req.body.carcode,owner:req.body.owner},function (err,ret) {
                 if(err){
                     return res.send(global.retFormate(0,err,'保存数据失败'));
@@ -108,6 +111,7 @@ var Repair = mongoose.model(global.config.ModelNameRepairHistory);
          *更新记录
          **/
         router.post('/update',function (req, res, next) {
+            global.log4bae('repair/update'+JSON.stringify(req.body));
             var conditions = {_id : req.body.id,owner:req.body.owner,};
             var update     = {$set : {
                 carcode:req.body.carcode,
@@ -120,7 +124,7 @@ var Repair = mongoose.model(global.config.ModelNameRepairHistory);
                 circle:req.body.circle,
                 isreaded:req.body.isreaded == undefined ? '0' : req.body.isreaded
             }};
-            var options    = {upsert : true};
+            var options    = {upsert : false};
             Repair.update(conditions,update,options,function (err,ret) {
                 if(err){
                     return res.send(global.retFormate(0,err,'修改数据失败'));
@@ -137,6 +141,7 @@ var Repair = mongoose.model(global.config.ModelNameRepairHistory);
          * 查询所有记录
          **/
         router.post('/queryAll',function (req, res, next) {
+            global.log4bae('repair/queryAll'+JSON.stringify(req.body));
             var conditions = {owner:req.body.owner};
             Repair.find(conditions,function (err,ret) {
                 if(err){

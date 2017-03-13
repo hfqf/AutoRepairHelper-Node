@@ -52,7 +52,7 @@ var krouky = new PersonModel({
 });
 如果每次想使用全名就得这样
 
-console.log(krouky.name.first + ' ' + krouky.name.last);
+global.log4bae(krouky.name.first + ' ' + krouky.name.last);
 显然这是很麻烦的，我们可以定义虚拟属性：
 
 PersonSchema.virtual('name.full').get(function(){
@@ -68,7 +68,7 @@ PersonSchema.virtual('name.full').set(function(name){
 var PersonModel = mongoose.model('Person',PersonSchema);
 var krouky = new PersonModel({});
 krouky.name.full = 'krouky han';//会被自动分解
-console.log(krouky.name.first);//krouky
+global.log4bae(krouky.name.first);//krouky
 */
 
 

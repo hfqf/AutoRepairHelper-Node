@@ -112,7 +112,7 @@ function onListening() {
 function pushNoti(user) {
     getUnreadCount(user,function (err,count) {
         if(err){
-            console.log('getUnreadCount:error'+err);
+            global.log4bae('getUnreadCount:error'+err);
             return;
         }
         var finalCount = 0;
@@ -122,11 +122,11 @@ function pushNoti(user) {
         }else if(typeof count == 'number' ){
             finalCount = count;
         }else {
-            console.log('undefined');
+            global.log4bae('undefined');
         }
 
+        global.log4bae('getUnreadCount:length'+finalCount+'user:'+user.toString());
         if(finalCount > 0){
-            console.log(user);
             //防止老用户的过期提醒
             if(user.ostype == undefined){
                 return;
@@ -138,10 +138,10 @@ function pushNoti(user) {
                     .setNotification('今天您有'+count+'条到期维修记录,快去看看吧', JPush.ios('今天您有'+count+'条到期维修记录,快去看看吧', '今天您有'+count+'条到期维修记录,快去看看吧', count))
                     .send(function(err, res) {
                         if (err) {
-                            console.log(err.message)
+                            global.log4bae(err.message)
                         } else {
-                            console.log('Sendno: ' + res.sendno)
-                            console.log('Msg_id: ' + res.msg_id)
+                            global.log4bae('Sendno: ' + res.sendno)
+                            global.log4bae('Msg_id: ' + res.msg_id)
                         }
                     });
             }else {
@@ -150,10 +150,10 @@ function pushNoti(user) {
                     .setNotification('今天您有'+count+'条到期维修记录,快去看看吧', JPush.ios('今天您有'+count+'条到期维修记录,快去看看吧', '今天您有'+count+'条到期维修记录,快去看看吧', count))
                     .send(function(err, res) {
                         if (err) {
-                            console.log(err.message)
+                            global.log4bae(err.message)
                         } else {
-                            console.log('Sendno: ' + res.sendno)
-                            console.log('Msg_id: ' + res.msg_id)
+                            global.log4bae('Sendno: ' + res.sendno)
+                            global.log4bae('Msg_id: ' + res.msg_id)
                         }
                     });
             }
@@ -204,8 +204,8 @@ function getUnreadCount(user,callback) {
         tipcircle:{'$lte':now}
     },function (err,doc) {
 
-        console.log('getUnreadCount:count'+doc.length);
-        console.log('getUnreadCount:doc'+doc.toString());
+        global.log4bae('getUnreadCount:count'+doc.length);
+        global.log4bae('getUnreadCount:doc'+doc.toString());
         if(err){
             return callback(err,0);
         }else {

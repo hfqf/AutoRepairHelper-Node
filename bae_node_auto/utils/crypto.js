@@ -12,7 +12,7 @@ var Crypto = function () {
         const cipher = crypto.createCipher('aes192', config.cryptoKey);
         var encrypted = cipher.update(data, 'utf8', 'hex');
         encrypted += cipher.final('hex');
-        console.log(encrypted);
+        global.log4bae(encrypted);
         return encrypted;
     }
 
@@ -20,7 +20,7 @@ var Crypto = function () {
         const decipher = crypto.createDecipher('aes192',config.cryptoKey);
         var decrypted = decipher.update(data, 'hex', 'utf8');
         decrypted += decipher.final('utf8');
-        console.log(decrypted);
+        global.log4bae(decrypted);
         return decrypted;
     }
 }

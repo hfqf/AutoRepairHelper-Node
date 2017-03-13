@@ -19,12 +19,9 @@ var async = require('async');
  * @param item
  * @param callback
  */
-
-
 //客户端把所有数据库记录弄成字串上传过来
 router.post('/contact',function (req, res, next) {
-    var  arrContact = JSON.parse(req.body.contact);
-
+    var  arrContact = req.body.contact;
     async.map(arrContact,function (item,callback) {
 
         var newContact = new  Contact({
@@ -35,7 +32,6 @@ router.post('/contact',function (req, res, next) {
             owner:item.owner == undefined ? '' : item.owner,
             id:item.id == undefined ? '' : item.id
         });
-
         //查看是否已有此人
         Contact.findOne({carcode:item.carcode},function (err,doc) {
                 if(err){
@@ -62,11 +58,9 @@ router.post('/contact',function (req, res, next) {
 
     },(e,v)=>{
         if(e){
-            console.log(e);
             return res.send(global.retFormate(0,e,'存入数据失败'));
         }
         else {
-            console.log(v);
             return res.send(global.retFormate(1,'存入数据成功','存入数据成功'));
         }
     })
@@ -82,10 +76,13 @@ router.post('/contact',function (req, res, next) {
 
 //客户端把所有数据库记录弄成字串上传过来 2.0
     router.post('/contact2',function (req, res, next) {
-        var  arrContact = JSON.parse(req.body.contact);
-
+        global.log4bae('async/contact2');
+        var  arrContact = req.body.contact;
+        if(arrContact.length == 0){
+            return res.send(global.retFormate(1,'无数据上传','无数据上传'));
+        }
         async.map(arrContact,function (item,callback) {
-
+            global.log4bae('async/contact2'+JSON.stringify(item));
             var newContact = new  Contact({
                 carcode:item.carcode,//唯一
                 name:item.name,
@@ -121,11 +118,9 @@ router.post('/contact',function (req, res, next) {
 
         },(e,v)=>{
             if(e){
-                console.log(e);
                 return res.send(global.retFormate(0,e,'存入数据失败'));
             }
             else {
-                console.log(v);
                 return res.send(global.retFormate(1,'存入数据成功','存入数据成功'));
             }
         })
@@ -135,7 +130,7 @@ router.post('/contact',function (req, res, next) {
      */
     router.post('/repair',function (req, res, next) {
 
-    var  arrRepair = JSON.parse(req.body.repair);
+    var  arrRepair = req.body.repair;
     async.map(arrRepair,function (item,callback) {
         var newRepair = new  Repair({
             id:item.id,
@@ -190,11 +185,9 @@ router.post('/contact',function (req, res, next) {
 
     },(e,v)=>{
         if(e){
-            console.log(e);
             return res.send(global.retFormate(0,e,'存入数据失败'));
         }
         else {
-            console.log(v);
             return res.send(global.retFormate(1,'存入数据成功','存入数据成功'));
         }
     })
@@ -205,10 +198,13 @@ router.post('/contact',function (req, res, next) {
      * 客户端把所有数据库记录弄成字串上传过来 2.0
      */
     router.post('/repair2',function (req, res, next) {
-
-        var  arrRepair = JSON.parse(req.body.repair);
+        global.log4bae('async/repair2');
+        var  arrRepair = req.body.repair;
+        if(arrRepair.length == 0){
+            return res.send(global.retFormate(1,'无数据上传','无数据上传'));
+        }
         async.map(arrRepair,function (item,callback) {
-
+            global.log4bae('async/repair2'+JSON.stringify(item));
             var newRepair = new  Repair({
                 id:item.id,
                 carcode:item.carcode,
@@ -262,11 +258,9 @@ router.post('/contact',function (req, res, next) {
 
         },(e,v)=>{
             if(e){
-                console.log(e);
                 return res.send(global.retFormate(0,e,'存入数据失败'));
             }
             else {
-                console.log(v);
                 return res.send(global.retFormate(1,'存入数据成功','存入数据成功'));
             }
         })

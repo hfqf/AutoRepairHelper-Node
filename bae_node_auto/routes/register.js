@@ -42,8 +42,15 @@ router.post('/addNewUser2',function (req,res,next) {
         var udid  = req.body.udid;
         var ostype  = req.body.ostype;
         var version  = req.body.version;
+        if(pwd.length > 8){
+            return res.send(global.retFormate(0,'密码不能长于八位','密码不能长于八位'));
+        }
 
-        var newUser = new  User({
+        global.log4bae('addNewUser2:tel'+req.body.tel);
+        global.log4bae('addNewUser2:pwd'+req.body.pwd);
+
+
+    var newUser = new  User({
             username:name,
             pwd:pwd,
             tel:tel,

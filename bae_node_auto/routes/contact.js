@@ -15,6 +15,8 @@ var Contact = mongoose.model(global.config.ModelNameContact);
  */
 router.post('/add',function (req, res, next) {
 
+    global.log4bae('contact/add'+JSON.stringify(req.body));
+
     var newContact = new  Contact({
         carcode:req.body.carcode,
         name:req.body.name,
@@ -54,6 +56,7 @@ router.post('/add',function (req, res, next) {
      * 删除客户
      * */
     router.post('/del',function (req, res, next) {
+        global.log4bae('contact/del'+JSON.stringify(req.body));
         Contact.remove({tel:req.body.tel,owner:req.body.owner},function (err,ret) {
             if(err){
                 return res.send(global.retFormate(0,err,'存入数据失败'));
@@ -70,6 +73,7 @@ router.post('/add',function (req, res, next) {
      * 删除客户2.0
      * */
     router.post('/del2',function (req, res, next) {
+        global.log4bae('contact/del2'+JSON.stringify(req.body));
         Contact.remove({_id:req.body.id},function (err,ret) {
             if(err){
                 return res.send(global.retFormate(0,err,'存入数据失败'));
@@ -85,13 +89,14 @@ router.post('/add',function (req, res, next) {
      *更新客户
      **/
     router.post('/update',function (req, res, next) {
+        global.log4bae('contact/update'+JSON.stringify(req.body));
         var conditions = {tel : req.body.tel,owner:req.body.owner};
         var update     = {$set : {
             carcode:req.body.carcode,
             name:req.body.name,
             cartype:req.body.cartype,
         }};
-        var options    = {upsert : true};
+        var options    = {upsert : false};
         Contact.update(conditions,update,options,function (err,ret) {
             if(err){
                 return res.send(global.retFormate(0,err,'修改数据失败'));
@@ -107,14 +112,15 @@ router.post('/add',function (req, res, next) {
      *更新客户2.0
      **/
     router.post('/update2',function (req, res, next) {
-        var conditions = {id : req.body.id};
+        global.log4bae('contact/update2'+JSON.stringify(req.body));
+        var conditions = {_id : req.body.id};
         var update     = {$set : {
             carcode:req.body.carcode,
             name:req.body.name,
             cartype:req.body.cartype,
             tel : req.body.tel
         }};
-        var options    = {upsert : true};
+        var options    = {upsert : false};
         Contact.update(conditions,update,options,function (err,ret) {
             if(err){
                 return res.send(global.retFormate(0,err,'修改数据失败'));
@@ -130,6 +136,7 @@ router.post('/add',function (req, res, next) {
      * 查询所有客户
      **/
     router.post('/queryAll',function (req, res, next) {
+        global.log4bae('contact/queryAll'+JSON.stringify(req.body));
         var conditions = {owner:req.body.owner};
         Contact.find(conditions,function (err,ret) {
             if(err){

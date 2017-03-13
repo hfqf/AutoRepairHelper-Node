@@ -10,6 +10,7 @@ var Crypto = require('../utils/crypto');
  * 2.0登录接口
  */
 router.post('/login2',function (req,res,next) {
+    global.log4bae('users/login2'+JSON.stringify(req.body));
     var _tel = req.body.username;
     var _pwd  = req.body.pwd;
     var _udid  = req.body.udid;
@@ -30,8 +31,15 @@ router.post('/login2',function (req,res,next) {
     var _ostype  = req.body.ostype;
     var _pushid  = req.body.pushid;
     var _isfirst  = req.body.isfirstlogin;
+
+    // if(_version != '2.2')
+    // {
+    //     global.logError4bae('users/login2'+'登录失败,请到AppStore升级到最新版本');
+    //     return res.send(global.retFormate(0,'登录失败,请到AppStore升级到最新版本','登录失败,请到AppStore升级到最新版本'));
+    // }
     User.findOne(cond,function (err,ret) {
             if(err){
+                global.logError4bae('users/login2'+err);
                 return res.send(global.retFormate(0,err,'登录失败'));
             }else {
 
@@ -49,6 +57,7 @@ router.post('/login2',function (req,res,next) {
                     if(ret.version == undefined){
                         User.remove({tel:_tel},function (err,ret) {
                             if(err){
+                                global.logError4bae('users/login2'+err);
                                 return res.send(global.retFormate(0,err,'登录失败'));
                             }
                             else {
@@ -66,6 +75,7 @@ router.post('/login2',function (req,res,next) {
 
                                 newModifyUser.save(function (err,ret) {
                                     if(err){
+                                        global.logError4bae('users/login2'+err);
                                         return res.send(global.retFormate(0,err,'存入数据失败'));
                                     }else {
                                         ret.devicemodifyed = '1';//因为版本数据不一致,强制数据更新
@@ -85,6 +95,7 @@ router.post('/login2',function (req,res,next) {
                             },
                             function(err,updateRet){
                                 if(err){
+                                    global.logError4bae('users/login2'+err);
                                     return res.send(global.retFormate(0, updateRet, '更新udid失败'));
                                 }else {
 
@@ -117,6 +128,7 @@ router.post('/login2',function (req,res,next) {
 
                 }else{
 
+                    global.logError4bae('users/login2'+'用户名或密码错误');
                     return res.send(global.retFormate(0, '用户名或密码错误', '用户名或密码错误'));
 
                 }

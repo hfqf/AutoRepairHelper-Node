@@ -25,10 +25,10 @@ router.get('/',function (req,res,next) {
             done(null, 'four');
         }
     }, function (error, result) {
-        console.log('one:', result.one);
-        console.log('two:', result.two);
-        console.log('three:', result.three);
-        console.log('four:', result.four);
+        global.log4bae('one:', result.one);
+        global.log4bae('two:', result.two);
+        global.log4bae('three:', result.three);
+        global.log4bae('four:', result.four);
         console.timeEnd('parallel');
     })
 
