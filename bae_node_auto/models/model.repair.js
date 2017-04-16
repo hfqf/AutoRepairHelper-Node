@@ -17,6 +17,7 @@ var RepairSchema = new mongoose.Schema({
     isreaded:String,
     owner:String,
     inserttime:String,
+    items:[{ type: mongoose.Schema.Types.ObjectId, ref: 'repairitem' }]
 });
 
 // mongoose.model(Setting.ModelNameContact,ContactSchema)

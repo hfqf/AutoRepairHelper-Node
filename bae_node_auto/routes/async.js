@@ -77,10 +77,18 @@ router.post('/contact',function (req, res, next) {
 //客户端把所有数据库记录弄成字串上传过来 2.0
     router.post('/contact2',function (req, res, next) {
         global.log4bae('async/contact2');
-        var  arrContact = req.body.contact;
+        var  arrContact = null;
+        if(typeof(req.body.contact) == "string"){//ios
+            arrContact = JSON.parse(req.body.contact);
+        }
+        else {//android
+            arrContact  = req.body.contact;
+        }
+
         if(arrContact.length == 0){
             return res.send(global.retFormate(1,'无数据上传','无数据上传'));
         }
+
         async.map(arrContact,function (item,callback) {
             global.log4bae('async/contact2'+JSON.stringify(item));
             var newContact = new  Contact({
@@ -199,7 +207,14 @@ router.post('/contact',function (req, res, next) {
      */
     router.post('/repair2',function (req, res, next) {
         global.log4bae('async/repair2');
-        var  arrRepair = req.body.repair;
+        var  arrRepair = null;
+        if(typeof(req.body.repair) == "string"){//ios
+            arrRepair = JSON.parse(req.body.repair);
+        }
+        else {//android
+            arrRepair  = req.body.repair;
+        }
+
         if(arrRepair.length == 0){
             return res.send(global.retFormate(1,'无数据上传','无数据上传'));
         }

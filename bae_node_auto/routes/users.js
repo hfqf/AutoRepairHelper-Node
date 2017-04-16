@@ -113,7 +113,7 @@ router.post('/login2',function (req,res,next) {
                                             }
 
                                         }else {
-                                            ret.devicemodifyed = '1';
+                                            ret.devicemodifyed = '0';//由于第一版的用户没有了，现在换手机不需要同步本地数据
                                             return res.send(global.retFormate(1, ret, '查询成功'));
                                         }
                                     }else {
@@ -139,8 +139,6 @@ router.post('/login2',function (req,res,next) {
 
 
 });
-
-
 
 
 /**
@@ -198,6 +196,20 @@ router.post('/login',function (req,res,next) {
 });
 
 
+//重置密码
+router.post('/regetpwd',function (req,res,next) {
+
+    global.logError4bae('users/regetpwd');
+    //TODO 等build14上线后，再升级的版本需要根据version的变化确定
+    User.update({tel:req.body.tel},{$set:{pwd:req.body.pwd}}, function(err,updateRet) {
+            if (err) {
+                return res.send(global.retFormate(0, err, '更新失败'));
+            } else {
+                return res.send(global.retFormate(1, updateRet, '更新成功'));
+            }
+        });
+
+});
 
 //修改密码
 router.post('/resetPwd',function (req,res,next) {

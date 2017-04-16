@@ -27,6 +27,7 @@
       "log4js": "0.6.9",
       "thrift": "0.9.1",
       "baev3-log":"*",
-      "baidu-ocr-api":"*"
+      "baidu-ocr-api":"*",
+      "node-xlsx":"*"
     }
 }
