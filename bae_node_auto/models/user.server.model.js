@@ -16,6 +16,7 @@ var UserSchema = new  mongoose.Schema({
         pushid:String,
        //2.1所加,确认当前设备是否因为版本升级同步数据时，要先删除本地数据库数据
         needasnc:{type:String,default:'0'},
+        headurl:{type:String,default:''}
 });
 
 //实例方法

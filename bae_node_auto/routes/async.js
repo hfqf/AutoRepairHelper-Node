@@ -14,272 +14,272 @@ var Repair = mongoose.model(global.config.ModelNameRepairHistory);
 var async = require('async');
 
 
-/**
- * 插入单个联系人
- * @param item
- * @param callback
- */
-//客户端把所有数据库记录弄成字串上传过来
-router.post('/contact',function (req, res, next) {
-    var  arrContact = req.body.contact;
-    async.map(arrContact,function (item,callback) {
-
-        var newContact = new  Contact({
-            carcode:item.carcode,
-            name:item.name,
-            tel:item.tel,
-            cartype:item.cartype,
-            owner:item.owner == undefined ? '' : item.owner,
-            id:item.id == undefined ? '' : item.id
-        });
-        //查看是否已有此人
-        Contact.findOne({carcode:item.carcode},function (err,doc) {
-                if(err){
-                    callback(err,1)
-                 }else {
-                     if(doc){
-                         callback(null,doc);
-                     }else {
-                         newContact.save(function (err,doc) {
-                             if(err){
-                                 callback(err,1)
-                             }else{
-                                 callback(null,doc);
-                             }
-
-                         });
-                     }
-                }
-             }
-        );
-
-
-
-
-    },(e,v)=>{
-        if(e){
-            return res.send(global.retFormate(0,e,'存入数据失败'));
-        }
-        else {
-            return res.send(global.retFormate(1,'存入数据成功','存入数据成功'));
-        }
-    })
-}),
-
-
-    /**
-     * 插入单个联系人
-     * @param item
-     * @param callback
-     */
-
-
-//客户端把所有数据库记录弄成字串上传过来 2.0
-    router.post('/contact2',function (req, res, next) {
-        global.log4bae('async/contact2');
-        var  arrContact = null;
-        if(typeof(req.body.contact) == "string"){//ios
-            arrContact = JSON.parse(req.body.contact);
-        }
-        else {//android
-            arrContact  = req.body.contact;
-        }
-
-        if(arrContact.length == 0){
-            return res.send(global.retFormate(1,'无数据上传','无数据上传'));
-        }
-
-        async.map(arrContact,function (item,callback) {
-            global.log4bae('async/contact2'+JSON.stringify(item));
-            var newContact = new  Contact({
-                carcode:item.carcode,//唯一
-                name:item.name,
-                tel:item.tel,
-                cartype:item.cartype,
-                owner:item.owner == undefined ? '' : item.owner,
-                id:item.id == undefined ? '' : item.id
-            });
-
-            //查看是否已有此人
-            Contact.findOne({carcode:item.carcode},function (err,doc) {
-                    if(err){
-                        callback(err,1)
-                    }else {
-                        if(doc){
-                            callback(null,doc);
-                        }else {
-                            newContact.save(function (err,doc) {
-                                if(err){
-                                    callback(err,1)
-                                }else{
-                                    callback(null,doc);
-                                }
-
-                            });
-                        }
-                    }
-                }
-            );
-
-
-
-
-        },(e,v)=>{
-            if(e){
-                return res.send(global.retFormate(0,e,'存入数据失败'));
-            }
-            else {
-                return res.send(global.retFormate(1,'存入数据成功','存入数据成功'));
-            }
-        })
-    }),
-    /**
-     * 客户端把所有数据库记录弄成字串上传过来
-     */
-    router.post('/repair',function (req, res, next) {
-
-    var  arrRepair = req.body.repair;
-    async.map(arrRepair,function (item,callback) {
-        var newRepair = new  Repair({
-            id:item.id,
-            carcode:item.carcode,
-            totalkm:item.totalkm,
-            repairetime:item.repairetime,
-            repairtype:item.repairtype,
-            addition:item.addition,
-            tipcircle:item.tipcircle,
-            isclose:item.isclose,
-            circle:item.circle,
-            isreaded:item.isreaded == undefined ? '' : item.isreaded,
-            owner:item.owner == undefined ? '' : item.owner,
-        });
-
-        //没有id肯定是新数据
-        if(item.id.length == 0){
-            newRepair.save(function (err,doc) {
-                if(err){
-                    callback(err,1)
-                }else{
-                    callback(null,doc);
-                }
-
-            });
-        }
-        else {
-            //先查看是否已保存过
-            Repair.findOne({_id:item.id},function (err,doc) {
-                if(err){
-                    callback(err,1)
-                }else {
-                    if(doc){
-                        callback(null,doc);
-                    }else {
-                        newRepair.save(function (err,doc) {
-                            if(err){
-                                callback(err,1)
-                            }else{
-                                callback(null,doc);
-                            }
-
-                        });
-                    }
-                }
-
-            });
-        }
-
-
-
-
-    },(e,v)=>{
-        if(e){
-            return res.send(global.retFormate(0,e,'存入数据失败'));
-        }
-        else {
-            return res.send(global.retFormate(1,'存入数据成功','存入数据成功'));
-        }
-    })
-}),
-
-
-    /**
-     * 客户端把所有数据库记录弄成字串上传过来 2.0
-     */
-    router.post('/repair2',function (req, res, next) {
-        global.log4bae('async/repair2');
-        var  arrRepair = null;
-        if(typeof(req.body.repair) == "string"){//ios
-            arrRepair = JSON.parse(req.body.repair);
-        }
-        else {//android
-            arrRepair  = req.body.repair;
-        }
-
-        if(arrRepair.length == 0){
-            return res.send(global.retFormate(1,'无数据上传','无数据上传'));
-        }
-        async.map(arrRepair,function (item,callback) {
-            global.log4bae('async/repair2'+JSON.stringify(item));
-            var newRepair = new  Repair({
-                id:item.id,
-                carcode:item.carcode,
-                totalkm:item.totalkm,
-                repairetime:item.repairetime,
-                repairtype:item.repairtype,
-                addition:item.addition,
-                tipcircle:item.tipcircle,
-                isclose:item.isclose,
-                circle:item.circle,
-                isreaded:item.isreaded == undefined ? '' : item.isreaded,
-                owner:item.owner == undefined ? '' : item.owner,
-                inserttime:(item.inserttime == undefined || item.inserttime.length < 10) ? new Date().Format('yyyy-MM-dd hh:mm:ss') : item.inserttime
-            });
-
-            if(item.id.length == 0){
-                newRepair.save(function (err,doc) {
-                    if(err){
-                        callback(err,1)
-                    }else{
-                        callback(null,doc);
-                    }
-
-                });
-            }
-            else {
-                //先查看是否已保存过
-                Repair.findOne({_id:item.id},function (err,doc) {
-                    if(err){
-                        callback(err,1)
-                    }else {
-                        if(doc){
-                            callback(null,doc);
-                        }else {
-                            newRepair.save(function (err,doc) {
-                                if(err){
-                                    callback(err,1)
-                                }else{
-                                    callback(null,doc);
-                                }
-
-                            });
-                        }
-                    }
-
-                });
-            }
-
-
-
-
-        },(e,v)=>{
-            if(e){
-                return res.send(global.retFormate(0,e,'存入数据失败'));
-            }
-            else {
-                return res.send(global.retFormate(1,'存入数据成功','存入数据成功'));
-            }
-        })
-    }),
+// /**
+//  * 插入单个联系人
+//  * @param item
+//  * @param callback
+//  */
+// //客户端把所有数据库记录弄成字串上传过来
+// router.post('/contact',function (req, res, next) {
+//     var  arrContact = req.body.contact;
+//     async.map(arrContact,function (item,callback) {
+//
+//         var newContact = new  Contact({
+//             carcode:item.carcode,
+//             name:item.name,
+//             tel:item.tel,
+//             cartype:item.cartype,
+//             owner:item.owner == undefined ? '' : item.owner,
+//             id:item.id == undefined ? '' : item.id
+//         });
+//         //查看是否已有此人
+//         Contact.findOne({carcode:item.carcode},function (err,doc) {
+//                 if(err){
+//                     callback(err,1)
+//                  }else {
+//                      if(doc){
+//                          callback(null,doc);
+//                      }else {
+//                          newContact.save(function (err,doc) {
+//                              if(err){
+//                                  callback(err,1)
+//                              }else{
+//                                  callback(null,doc);
+//                              }
+//
+//                          });
+//                      }
+//                 }
+//              }
+//         );
+//
+//
+//
+//
+//     },(e,v)=>{
+//         if(e){
+//             return res.send(global.retFormate(0,e,'存入数据失败'));
+//         }
+//         else {
+//             return res.send(global.retFormate(1,'存入数据成功','存入数据成功'));
+//         }
+//     })
+// }),
+//
+//
+//     /**
+//      * 插入单个联系人
+//      * @param item
+//      * @param callback
+//      */
+//
+//
+// //客户端把所有数据库记录弄成字串上传过来 2.0
+//     router.post('/contact2',function (req, res, next) {
+//         global.log4bae('async/contact2');
+//         var  arrContact = null;
+//         if(typeof(req.body.contact) == "string"){//ios
+//             arrContact = JSON.parse(req.body.contact);
+//         }
+//         else {//android
+//             arrContact  = req.body.contact;
+//         }
+//
+//         if(arrContact.length == 0){
+//             return res.send(global.retFormate(1,'无数据上传','无数据上传'));
+//         }
+//
+//         async.map(arrContact,function (item,callback) {
+//             global.log4bae('async/contact2'+JSON.stringify(item));
+//             var newContact = new  Contact({
+//                 carcode:item.carcode,//唯一
+//                 name:item.name,
+//                 tel:item.tel,
+//                 cartype:item.cartype,
+//                 owner:item.owner == undefined ? '' : item.owner,
+//                 id:item.id == undefined ? '' : item.id
+//             });
+//
+//             //查看是否已有此人
+//             Contact.findOne({carcode:item.carcode},function (err,doc) {
+//                     if(err){
+//                         callback(err,1)
+//                     }else {
+//                         if(doc){
+//                             callback(null,doc);
+//                         }else {
+//                             newContact.save(function (err,doc) {
+//                                 if(err){
+//                                     callback(err,1)
+//                                 }else{
+//                                     callback(null,doc);
+//                                 }
+//
+//                             });
+//                         }
+//                     }
+//                 }
+//             );
+//
+//
+//
+//
+//         },(e,v)=>{
+//             if(e){
+//                 return res.send(global.retFormate(0,e,'存入数据失败'));
+//             }
+//             else {
+//                 return res.send(global.retFormate(1,'存入数据成功','存入数据成功'));
+//             }
+//         })
+//     }),
+//     /**
+//      * 客户端把所有数据库记录弄成字串上传过来
+//      */
+//     router.post('/repair',function (req, res, next) {
+//
+//     var  arrRepair = req.body.repair;
+//     async.map(arrRepair,function (item,callback) {
+//         var newRepair = new  Repair({
+//             id:item.id,
+//             carcode:item.carcode,
+//             totalkm:item.totalkm,
+//             repairetime:item.repairetime,
+//             repairtype:item.repairtype,
+//             addition:item.addition,
+//             tipcircle:item.tipcircle,
+//             isclose:item.isclose,
+//             circle:item.circle,
+//             isreaded:item.isreaded == undefined ? '' : item.isreaded,
+//             owner:item.owner == undefined ? '' : item.owner,
+//         });
+//
+//         //没有id肯定是新数据
+//         if(item.id.length == 0){
+//             newRepair.save(function (err,doc) {
+//                 if(err){
+//                     callback(err,1)
+//                 }else{
+//                     callback(null,doc);
+//                 }
+//
+//             });
+//         }
+//         else {
+//             //先查看是否已保存过
+//             Repair.findOne({_id:item.id},function (err,doc) {
+//                 if(err){
+//                     callback(err,1)
+//                 }else {
+//                     if(doc){
+//                         callback(null,doc);
+//                     }else {
+//                         newRepair.save(function (err,doc) {
+//                             if(err){
+//                                 callback(err,1)
+//                             }else{
+//                                 callback(null,doc);
+//                             }
+//
+//                         });
+//                     }
+//                 }
+//
+//             });
+//         }
+//
+//
+//
+//
+//     },(e,v)=>{
+//         if(e){
+//             return res.send(global.retFormate(0,e,'存入数据失败'));
+//         }
+//         else {
+//             return res.send(global.retFormate(1,'存入数据成功','存入数据成功'));
+//         }
+//     })
+// }),
+//
+//
+//     /**
+//      * 客户端把所有数据库记录弄成字串上传过来 2.0
+//      */
+//     router.post('/repair2',function (req, res, next) {
+//         global.log4bae('async/repair2');
+//         var  arrRepair = null;
+//         if(typeof(req.body.repair) == "string"){//ios
+//             arrRepair = JSON.parse(req.body.repair);
+//         }
+//         else {//android
+//             arrRepair  = req.body.repair;
+//         }
+//
+//         if(arrRepair.length == 0){
+//             return res.send(global.retFormate(1,'无数据上传','无数据上传'));
+//         }
+//         async.map(arrRepair,function (item,callback) {
+//             global.log4bae('async/repair2'+JSON.stringify(item));
+//             var newRepair = new  Repair({
+//                 id:item.id,
+//                 carcode:item.carcode,
+//                 totalkm:item.totalkm,
+//                 repairetime:item.repairetime,
+//                 repairtype:item.repairtype,
+//                 addition:item.addition,
+//                 tipcircle:item.tipcircle,
+//                 isclose:item.isclose,
+//                 circle:item.circle,
+//                 isreaded:item.isreaded == undefined ? '' : item.isreaded,
+//                 owner:item.owner == undefined ? '' : item.owner,
+//                 inserttime:(item.inserttime == undefined || item.inserttime.length < 10) ? new Date().Format('yyyy-MM-dd hh:mm:ss') : item.inserttime
+//             });
+//
+//             if(item.id.length == 0){
+//                 newRepair.save(function (err,doc) {
+//                     if(err){
+//                         callback(err,1)
+//                     }else{
+//                         callback(null,doc);
+//                     }
+//
+//                 });
+//             }
+//             else {
+//                 //先查看是否已保存过
+//                 Repair.findOne({_id:item.id},function (err,doc) {
+//                     if(err){
+//                         callback(err,1)
+//                     }else {
+//                         if(doc){
+//                             callback(null,doc);
+//                         }else {
+//                             newRepair.save(function (err,doc) {
+//                                 if(err){
+//                                     callback(err,1)
+//                                 }else{
+//                                     callback(null,doc);
+//                                 }
+//
+//                             });
+//                         }
+//                     }
+//
+//                 });
+//             }
+//
+//
+//
+//
+//         },(e,v)=>{
+//             if(e){
+//                 return res.send(global.retFormate(0,e,'存入数据失败'));
+//             }
+//             else {
+//                 return res.send(global.retFormate(1,'存入数据成功','存入数据成功'));
+//             }
+//         })
+//     }),
 
     Date.prototype.Format = function (fmt) { //author: meizz
         var o = {

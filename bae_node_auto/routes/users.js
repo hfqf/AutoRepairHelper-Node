@@ -128,9 +128,32 @@ router.post('/login2',function (req,res,next) {
 
                 }else{
 
-                    global.logError4bae('users/login2'+'用户名或密码错误');
-                    return res.send(global.retFormate(0, '用户名或密码错误', '用户名或密码错误'));
+                    var _tel = req.body.username;
+                    var _pwd  = req.body.pwd;
+                    var  cond = {
+                        //平等的条件
+                        $or:[
+                            {username:_tel},
+                            {tel:_tel},
+                            ]
+                    };
+                    User.findOne(cond,function (err,ret) {
 
+                        if(err){
+                            return res.send(global.retFormate(0, '用户名或密码错误', '用户名或密码错误'));
+
+                        }else {
+                            if(ret){
+                                return res.send(global.retFormate(0, '密码错误', '密码错误'));
+
+                            }else {
+                                return res.send(global.retFormate(0, '账号错误,如还未注册请先注册', '账号错误,如还未注册请先注册'));
+
+                            }
+                        }
+
+                    })
+                    global.logError4bae('users/login2'+'用户名或密码错误');
                 }
 
             }
@@ -213,9 +236,51 @@ router.post('/regetpwd',function (req,res,next) {
 
 //修改密码
 router.post('/resetPwd',function (req,res,next) {
+    global.logError4bae('users/resetPwd');
 
 
 });
+
+/**
+ * 更新用户资料
+ */
+router.post('/update',function (req,res,next) {
+
+    global.logError4bae('users/update');
+    // var setFileds = new Map();
+    // if(req.body.headurl != undefined){
+    //     setFileds.set('headurl',req.body.headurl);
+    // }
+
+
+
+    User.update({tel:req.body.tel},{$set:{headurl:req.body.headurl}}, function(err,updateRet) {
+        if (err) {
+            return res.send(global.retFormate(0, err, '更新失败'));
+        } else {
+            return res.send(global.retFormate(1, updateRet, '更新成功'));
+        }
+    });
+
+});
+
+/**
+ * 更新用户名
+ */
+router.post('/updateName',function (req,res,next) {
+
+    global.logError4bae('users/updateName');
+
+    User.update({tel:req.body.tel},{$set:{username:req.body.username}}, function(err,updateRet) {
+        if (err) {
+            return res.send(global.retFormate(0, err, '更新失败'));
+        } else {
+            return res.send(global.retFormate(1, updateRet, '更新成功'));
+        }
+    });
+
+});
+
 
 router.get('/encrypt',function (req,res,next) {
    var cry = new Crypto();

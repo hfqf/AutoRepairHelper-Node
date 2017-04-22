@@ -39,7 +39,6 @@ var contact = require('./routes/contact');
 var repair = require('./routes/repair');
 var prom =  require('./routes/prom');
 var repstatistic = require('./routes/repairstatistics');
-var excel =  require('./routes/excel');
 var repairitem = require('./routes/repairitem');
 
 var app = express();
@@ -71,7 +70,6 @@ app.use('/contact',contact);
 app.use('/repair',repair);
 app.use('/prom',prom);
 app.use('/repairstatistics',repstatistic);
-app.use('/excel',excel);
 app.use('/repairitem',repairitem);
 
 // catch 404 and forward to error handler

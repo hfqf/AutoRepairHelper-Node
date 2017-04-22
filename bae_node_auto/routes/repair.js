@@ -170,11 +170,11 @@ var Item = mongoose.model(global.config.ModelNameRepairItem);
 
 
         /**
-         * 查询所有记录
+         * 查询某个用户的所有记录
          **/
-        router.post('/queryAll',function (req, res, next) {
+        router.post('/queryOneAll',function (req, res, next) {
             global.log4bae('repair/queryAll'+JSON.stringify(req.body));
-            var conditions = {owner:req.body.owner};
+            var conditions = {owner:req.body.owner,carcode:req.body.carcode};
             Repair.find(conditions).populate('items').exec(function (err,ret) {
                 if(err){
                     return res.send(global.retFormate(0,err,'查询数据失败'));
@@ -185,6 +185,23 @@ var Item = mongoose.model(global.config.ModelNameRepairItem);
             });
 
         }),
+
+            /**
+             * 查询所有记录
+             **/
+            router.post('/queryAll',function (req, res, next) {
+                global.log4bae('repair/queryAll'+JSON.stringify(req.body));
+                var conditions = {owner:req.body.owner};
+                Repair.find(conditions).populate('items').exec(function (err,ret) {
+                    if(err){
+                        return res.send(global.retFormate(0,err,'查询数据失败'));
+                    }
+                    else {
+                        return res.send(global.retFormate(1,ret,'查询数据成功'));
+                    }
+                });
+
+            }),
 
             /**
              * 查询所有记录
@@ -216,10 +233,17 @@ var Item = mongoose.model(global.config.ModelNameRepairItem);
          */
         router.get('/print',function (req, res, next) {
             global.log4bae('repair/print'+JSON.stringify(req.query));
-            var conditions = {
-                carcode:req.query.carcode,
-                inserttime:{'$gte':req.query.start,'$lte':req.query.end}
-            };
+            var caocode =  req.query.carcode;
+            var conditions = caocode.length == 0 ?
+                {
+                    owner:req.query.owner,
+                    inserttime:{'$gte':req.query.start,'$lte':req.query.end}
+                }:
+                {
+                    owner:req.query.owner,
+                    carcode:req.query.carcode,
+                    inserttime:{'$gte':req.query.start,'$lte':req.query.end}
+                };
 
             /*
             var now = new Date().Format("yyyy-MM-dd");
@@ -245,22 +269,42 @@ var Item = mongoose.model(global.config.ModelNameRepairItem);
                             var arrItems = info.items;
                             var showItems = '';
                             var index = i+1;
-
                             var total = 0;
-                            for(  var j = 0;j<arrItems.length;j++) {
-                                var itemInfo = arrItems[j];
-                                showItems+='收费项目:'+itemInfo.type+'&nbsp;&nbsp;   总价:'+itemInfo.price+'x'+itemInfo.num+'='+itemInfo.price*itemInfo.num+'<br>';
-                                total +=itemInfo.price*itemInfo.num;
+
+                            if(arrItems == null || arrItems == undefined){//无收费项目
+                                showItems='暂无';
+                            }else
+                            {
+                                if(arrItems.length == 0) {
+                                    showItems='暂无';
+
+                                }else{
+                                    for(  var j = 0;j<arrItems.length;j++) {
+                                        var itemInfo = arrItems[j];
+                                        showItems+='收费项目:'+itemInfo.type+'&nbsp;&nbsp;   总价:'+itemInfo.price+'x'+itemInfo.num+'='+itemInfo.price*itemInfo.num+'<br>';
+                                        total +=itemInfo.price*itemInfo.num;
+                                    }
+                                }
                             }
+
+                            var more = '';
+                            if(info.addition == null || info.addition == undefined || info.addition == ''){//无收费项目
+                                more='暂无';
+                            }else
+                            {
+                                more = info.addition;
+                            }
+
                              insert +='<tr>' +
                                          '<td>'+index+'</td>'+
+                                         '<td>'+info.carcode+'</td>'+
                                          '<td>'+info.inserttime+'</td>'+
                                          '<td>'+info.tipcircle+'</td>'+
                                          '<td>'+total+'</td>'+
                                          '<td>'+showItems+'</td>'+
                                          '<td>'+info.totalkm+'km'+'</td>'+
                                          '<td>'+info.repairtype+'</td>'+
-                                         '<td>'+info.addition+'</td>' +
+                                         '<td>'+more+'</td>' +
                                       '</tr>';
                         }
                         res.render('repairprint', { value: insert,layout: 'repairprint'});
@@ -271,4 +315,61 @@ var Item = mongoose.model(global.config.ModelNameRepairItem);
                 }
               );
         }),
-        module.exports = router;
+
+
+            /**
+             * 获取今天的进账金额和维修次数
+             */
+            router.post('/getTodayBills',function (req,res,next) {
+
+                global.logError4bae('repair/getTodayBills');
+
+                var start = req.body.day+' 00:00:01';
+                var end   = req.body.day+' 23:59:59';
+                Repair.find({
+                                owner:req.body.owner,
+                                inserttime:{'$gte':start,'$lte':end}
+                            })
+                            .sort({'_id':-1})
+                            .populate('items')
+                            .exec(function (err,ret){
+                    if (err) {
+                        return res.send(global.retFormate(0, err, '获取失败'));
+                    } else {
+
+                        var totalPrice = 0;
+                        var totalRepCount = 0;
+                        if(ret == null) {
+
+                        }else{
+                            totalRepCount =  ret.length;
+                            for( var  i = 0;i<ret.length;i++) {
+                                var info = ret[i];
+                                if (info == undefined) {
+                                    continue;
+                                }
+                                var arrItems = info.items;
+
+                                if (arrItems == null || arrItems == undefined) {
+
+                                } else {
+                                    if (arrItems.length == 0) {
+
+                                    }
+                                    else {
+                                        for (var j = 0; j < arrItems.length; j++) {
+                                            var itemInfo = arrItems[j];
+                                            totalPrice += itemInfo.price * itemInfo.num;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        return res.send(global.retFormate(1, {'totalprice':totalPrice,'totalRepCount':totalRepCount}, '获取成功'));
+                    }
+                });
+
+            });
+
+module.exports = router;
