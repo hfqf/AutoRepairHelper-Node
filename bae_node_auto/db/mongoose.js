@@ -13,5 +13,20 @@ module.exports=function () {
     require('../models/model.noticeboard');
     require('../models/model.update');
     require('../models/model.repair.item');
+    require('../models/model.weixin.accesstoken');
+    require('../models/model.contact.order');
+
+    require('../models/warehouse.goods');
+    require('../models/warehouse.goodsactioninfo');
+    require('../models/warehouse.goodsinoutrecord');
+    require('../models/warehouse.goodspurchase');
+    require('../models/warehouse.goodspurchaserecord');
+    require('../models/warehouse.goodsstore');
+    require('../models/warehouse.goodsstore');
+    require('../models/warehouse.goodstoptype');
+    require('../models/warehouse.supplier');
+    require('../models/warehouse.warehouse');
+    require('../models/warehouse.warehouseposition');
+
     return db;
 };

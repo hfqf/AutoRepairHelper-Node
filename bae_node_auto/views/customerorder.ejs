@@ -1,0 +1,130 @@
+<h1<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection" content="telephone=no">
+    <meta HTTP-EQUIV="pragma" CONTENT="no-cache">
+    <meta HTTP-EQUIV="Cache-Control" CONTENT="no-cache, must-revalidate">
+    <meta HTTP-EQUIV="expires" CONTENT="0">
+
+    <title>预约维修保养</title>
+    <link rel='stylesheet' href='/stylesheets/bootstrap.css' />
+    <link rel="stylesheet" href="/stylesheets/bootstrap-responsive.css" >
+    <link href="/stylesheets/bootstrap.min.css" rel="stylesheet" >
+    <link href="/stylesheets/bootstrap-datetimepicker.min.css" rel="stylesheet" >
+    <meta charset="utf-8">
+</head>
+<body >
+
+
+<div class="container">
+
+    <div style="padding-top: 20px" class="row">
+
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <label  style="font-size: 20px"  for="dtp_input1" class="col-md-2 control-label">预计时间</label>
+            <div style="width: 100%" class="input-group date form_datetime col-md-5"  data-date-format="yyyy-MM-dd  hh:mm" data-link-field="dtp_input1">
+                <input style="width: 100%;height: 30px;font-size: 20px"  class="form-control" size="16" type="text" value="" id="input_time" readonly>
+                <span class="input-group-addon"><span class="glyphicon glyphicon-remove"></span></span>
+                <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
+            </div>
+            <input type="hidden" id="dtp_input1" value="" /><br/>
+        </div>
+
+    </div>
+
+    <div style="padding-top: 20px"  class="row">
+
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <label style="font-size: 20px" for="dtp_input1" class="col-md-2 control-label">预约内容</label>
+            <div class="e-inline">
+                <textarea style="width: 100%;height: 200px; font-size: 20px"  class="txta" name="" placeholder="为了更好的给您提供服务，请告诉我们您的大致预约项目或要更换的配件" id="input_order_content" cols="30" rows="3"></textarea>
+            </div>
+        </div>
+
+
+    </div>
+
+
+    <div style="padding-top: 20px" class="row">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <button style="width: 100%;height: 40px;font-size: 20px"  id="fat-btn" data-loading-text="提交" class="btn btn-primary"  onclick="yy()" >提交</button>
+        </div>
+
+
+    </div>
+
+</div>
+
+</body>
+</html>
+
+
+
+<script src="/javascripts/jquery.js"></script>
+<script src="/javascripts/bootstrap.js"></script>
+<script type="text/javascript" src="/javascripts/bootstrap-datetimepicker.js" charset="UTF-8"></script>
+<script type="text/javascript" src="/javascripts/bootstrap-datetimepicker.min.js" charset="UTF-8"></script>
+<script type="text/javascript" src="/javascripts/bootstrap-datetimepicker.zh-CN.js" charset="UTF-8"></script>
+<script type="text/javascript">
+
+    if(typeof(Storage) !== "undefined") {
+        var _openid =  '<%- openid %>';
+        sessionStorage.openid = _openid;
+    }
+
+    $('.form_datetime').datetimepicker({
+
+        minView: 'hour',
+        format:'yyyy-mm-dd hh:ii',
+        weekStart: 1,
+        todayBtn:  1,
+        autoclose: 1,
+        todayHighlight: 1,
+        startView: 2,
+        forceParse: 0,
+        showMeridian: 1,
+        language: 'zh-CN'
+
+    });
+
+    $(function()
+    {
+
+        $("#fat-btn").click(function () {
+            if ($("#input_time").val() == "") {
+                alert("请输入预约时间");
+                return;
+            }
+
+            if ($("#input_order_content").val() == "") {
+                alert("请输入预约内容");
+                return;
+            }
+
+            if (sessionStorage.openid.length == 0) {
+                alert("您还不是绑定用户,请先绑定手机号码");
+                return;
+            }
+
+            $.post("/contact/addRrderRepair",
+                {openid:sessionStorage.openid,
+                    time:$("#input_time").val().toString(),
+                    info:$("#input_order_content").val().toString()},
+                function (data,status,xhr) {
+                    var ret = JSON.parse(data);
+                    if(ret.code == '1' || ret.code == 1){
+                        alert("预约成功,您的预约一旦被受理,将在微信公众号收到通知");
+                    }else {
+                        alert(ret.msg);
+                    }
+                })
+        });
+    });
+
+
+
+</script>

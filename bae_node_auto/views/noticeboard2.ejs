@@ -9,7 +9,7 @@
     <meta HTTP-EQUIV="pragma" CONTENT="no-cache">
     <meta HTTP-EQUIV="Cache-Control" CONTENT="no-cache, must-revalidate">
     <meta HTTP-EQUIV="expires" CONTENT="0">
-    <title>统计</title>
+    <title>公告栏</title>
     <link rel='stylesheet' href='/stylesheets/bootstrap.css' />
     <link rel="stylesheet" href="/stylesheets/bootstrap-responsive.css" >
     <style type="text/css">
@@ -21,26 +21,25 @@
 </head>
 <body>
 
-<div class="table-responsive">
-    <table class="table table-bordered">
-        <thead>
-        <tr class="success">
-            <th>序号</th>
-            <th>车牌号</th>
-            <th>添加时间</th>
-            <th>提醒时间</th>
-            <th>收费总价</th>
-            <th>收费详细</th>
-            <th>公里数</th>
-            <th>保养项目</th>
-            <th>备注</th>
-        </tr>
-        </thead>
-        <tbody>
-        <%- value %>
-        </tbody>
-    </table>
+<div style="alignment:center;width:100%;text-align:center;padding-top: 20px">
+    <img src="../images/wxgzh.png" alt="微信公众号" width=100 height=100 style="alignment:center" >
 </div>
+<div style="font-size: 15px ;text-align:center">汽修小助手微信公众号二维码
+</div>
+<br>
+
+
+
+<div style="background:#FAFAFA;
+            font-size: 14px;
+            padding-top:1px;
+            height: 100%;
+            border-radius:5px;
+            text-indent:1em;
+            line-height:100%">
+    <%- value %>
+</div>
+
 </body>
 <script src="/javascripts/jquery.js"></script>
 <script src="/javascripts/bootstrap.js"></script>

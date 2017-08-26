@@ -40,6 +40,10 @@ var repair = require('./routes/repair');
 var prom =  require('./routes/prom');
 var repstatistic = require('./routes/repairstatistics');
 var repairitem = require('./routes/repairitem');
+var weixin = require('./routes/weixin');
+var wechat = require('wechat');
+var oauth = require('./routes/oauth');
+
 
 var app = express();
 
@@ -57,7 +61,7 @@ log4bae(path.join(__dirname, 'public'));
 app.use(favicon(__dirname + '/public/favicon.ico'));
 app.use(bodyParser.json({limit:'10000kb'}));
 app.use(bodyParser.urlencoded({limit:'10000kb',extended:true}));
-
+app.use(express.query());
 
 app.use('/', index);
 app.use('/users', users);
@@ -71,6 +75,9 @@ app.use('/repair',repair);
 app.use('/prom',prom);
 app.use('/repairstatistics',repstatistic);
 app.use('/repairitem',repairitem);
+app.use('/weixin',weixin);
+app.use('/oauth',oauth);
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -78,6 +85,10 @@ app.use(function(req, res, next) {
   err.status = 404;
   next(err);
 });
+
+
+
+
 
 // error handlers
 

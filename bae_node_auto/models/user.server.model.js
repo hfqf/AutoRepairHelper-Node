@@ -16,7 +16,16 @@ var UserSchema = new  mongoose.Schema({
         pushid:String,
        //2.1所加,确认当前设备是否因为版本升级同步数据时，要先删除本地数据库数据
         needasnc:{type:String,default:'0'},
-        headurl:{type:String,default:''}
+        headurl:{type:String,default:''},
+        //3.2
+        registertime:{type:String,default:''},//注册时间
+        lastlogintime:{type:String,default:''},//上次登录事件
+        city:{type:String,default:''},//所属城市
+        downchannel:{type:String,default:''},//下载渠道
+        address:{type:String,default:''},//维修点地址,通知客户去提车
+        shopname:{type:String,default:''}//维修店名称,通知客户去提车
+
+
 });
 
 //实例方法
@@ -71,7 +80,6 @@ var krouky = new PersonModel({});
 krouky.name.full = 'krouky han';//会被自动分解
 global.log4bae(krouky.name.first);//krouky
 */
-
 
 
 // mongoose.model(Setting.ModelNameContact,ContactSchema)

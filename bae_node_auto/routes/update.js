@@ -10,7 +10,7 @@ var Update = mongoose.model(Setting.ModelNameUpdate);
 
 router.get('/ios',function (req,res,next) {
 
-    Update.findOne({},function (err,ret) {
+    Update.findOne({os:'ios'},function (err,ret) {
             if(err){
                 res.send(global.retFormate(0, err, '获取数据失败'));
             }else {
@@ -22,7 +22,7 @@ router.get('/ios',function (req,res,next) {
 
 router.get('/android',function (req,res,next) {
 
-    Update.findOne({},function (err,ret) {
+    Update.findOne({os:'android'},function (err,ret) {
         if(err){
             res.send(global.retFormate(0, err, '获取数据失败'));
         }else {

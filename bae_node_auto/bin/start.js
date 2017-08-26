@@ -13,7 +13,7 @@ var client = JPush.buildClient(config.JPush.JPushAppKey, config.JPush.JPushMaste
 var mongoose = require('mongoose');
 var User = mongoose.model(config.mongooseModelName);
 var Repair = mongoose.model(config.ModelNameRepairHistory);
-
+var WeixinTokener = require('../weixin/accesstoken');
 
 /**
  * Get port from environment and store in Express.
@@ -100,8 +100,8 @@ function onListening() {
   //开始定时器
   startPush();
 
-
-
+  //每天00：00：00刷新微信token
+    WeixinTokener.refreshWeixinToken();
 }
 
 
@@ -112,52 +112,54 @@ function onListening() {
 function pushNoti(user) {
     getUnreadCount(user,function (err,count) {
         if(err){
-            global.log4bae('getUnreadCount:error'+err);
-            return;
+            global.log4bae(user.toString()+'getUnreadCount:error'+err);
         }
-        var finalCount = 0;
-
-        if(typeof count ==  'string'){
-            finalCount =  parseInt(count);
-        }else if(typeof count == 'number' ){
-            finalCount = count;
-        }else {
-            global.log4bae('undefined');
-        }
-
-        global.log4bae('getUnreadCount:length'+finalCount+'user:'+user.toString());
-        if(finalCount > 0){
-            //防止老用户的过期提醒
-            if(user.ostype == undefined){
-                return;
-            }
-            if(user.ostype == 'ios' ) {
-                client.push().setPlatform('ios')
-                    .setOptions(null,null,null,config.JPush_IS_Production,null)
-                    .setAudience(JPush.registration_id([user.pushid]))
-                    .setNotification('今天您有'+count+'条到期维修记录,快去看看吧', JPush.ios('今天您有'+count+'条到期维修记录,快去看看吧', '今天您有'+count+'条到期维修记录,快去看看吧', count))
-                    .send(function(err, res) {
-                        if (err) {
-                            global.log4bae(err.message)
-                        } else {
-                            global.log4bae('Sendno: ' + res.sendno)
-                            global.log4bae('Msg_id: ' + res.msg_id)
-                        }
-                    });
+        else {
+            var finalCount = 0;
+            if(typeof count ==  'string'){
+                finalCount =  parseInt(count);
+            }else if(typeof count == 'number' ){
+                finalCount = count;
             }else {
-                client.push().setPlatform('android')
-                    .setAudience(JPush.registration_id([user.pushid]))
-                    .setNotification('今天您有'+count+'条到期维修记录,快去看看吧', JPush.ios('今天您有'+count+'条到期维修记录,快去看看吧', '今天您有'+count+'条到期维修记录,快去看看吧', count))
-                    .send(function(err, res) {
-                        if (err) {
-                            global.log4bae(err.message)
-                        } else {
-                            global.log4bae('Sendno: ' + res.sendno)
-                            global.log4bae('Msg_id: ' + res.msg_id)
-                        }
-                    });
+                global.log4bae('undefined');
+            }
+            global.log4bae('getUnreadCount:length'+finalCount+'user:'+user.toString());
+            if(finalCount > 0){
+                //防止老用户的过期提醒
+                if(user.ostype == undefined){
+                    global.log4bae(user.toString()+'user.ostype undefined');
+                }else {
+                    if(user.ostype == 'ios' ) {
+                        client.push().setPlatform('ios')
+                            .setOptions(null,null,null,config.JPush_IS_Production,null)
+                            .setAudience(JPush.registration_id([user.pushid]))
+                            .setNotification('今天您有'+count+'条到期维修记录,快去看看吧', JPush.ios('今天您有'+count+'条到期维修记录,快去看看吧', '今天您有'+count+'条到期维修记录,快去看看吧', count))
+                            .send(function(err, res) {
+                                if (err) {
+                                    global.log4bae(err.message)
+                                } else {
+                                    global.log4bae('Sendno: ' + res.sendno)
+                                    global.log4bae('Msg_id: ' + res.msg_id)
+                                }
+                            });
+                    }else {
+                        client.push().setPlatform('android')
+                            .setAudience(JPush.registration_id([user.pushid]))
+                            .setNotification('今天您有'+count+'条到期维修记录,快去看看吧', JPush.ios('今天您有'+count+'条到期维修记录,快去看看吧', '今天您有'+count+'条到期维修记录,快去看看吧', count))
+                            .send(function(err, res) {
+                                if (err) {
+                                    global.log4bae(err.message)
+                                } else {
+                                    global.log4bae('Sendno: ' + res.sendno)
+                                    global.log4bae('Msg_id: ' + res.msg_id)
+                                }
+                            });
+                    }
+                }
+
             }
         }
+
     });
 
 
@@ -178,9 +180,11 @@ function startPush () {
 
                     }
                     else {
+
+                        global.log4bae('User.find:'+docs.length);
                         for(var i = 0 ;i<docs.length;i++){
                             var user = docs[i];
-                           pushNoti(user);
+                            pushNoti(user);
                         }
                     }
                 });
@@ -204,8 +208,6 @@ function getUnreadCount(user,callback) {
         tipcircle:{'$lte':now}
     },function (err,doc) {
 
-        global.log4bae('getUnreadCount:count'+doc.length);
-        global.log4bae('getUnreadCount:doc'+doc.toString());
         if(err){
             return callback(err,0);
         }else {

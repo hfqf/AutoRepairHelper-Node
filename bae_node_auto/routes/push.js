@@ -7,17 +7,10 @@ var Setting = require('../utils/config');
 var mongoose = require('mongoose');
 var root = require('../bin/start');
 var log_bae = require('../utils/logger4js');
+var Weixin = require('../weixin/accesstoken');
 
 router.get('/ios',function (req,res,next) {
-
-    root.pushTest(function (err, docs) {
-        if(err){
-            res.send(err);
-
-        }else {
-            res.send(docs);
-        }
-    });
+    Weixin.refreshWeixinToken();
 });
 
 router.get('/android',function (req,res,next) {

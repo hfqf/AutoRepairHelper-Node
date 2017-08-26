@@ -6,19 +6,26 @@ var Setting = require('../utils/config.js');
 
 var RepairSchema = new mongoose.Schema({
     id:String,
-    carcode:String,
-    totalkm:String,
-    repairetime:String,
-    repairtype:String,
-    addition:String,
-    tipcircle:String,
-    isclose:String,
-    circle:String,
-    isreaded:String,
-    owner:String,
-    inserttime:String,
-    items:[{ type: mongoose.Schema.Types.ObjectId, ref: 'repairitem' }]
+    carcode:{type:String,default:''},
+    totalkm:{type:String,default:''},
+    repairetime:{type:String,default:''},
+    repairtype:{type:String,default:''},
+    addition:{type:String,default:''},
+    tipcircle:{type:String,default:''},
+    isclose:{type:String,default:'0'},
+    circle:{type:String,default:''},
+    isreaded:{type:String,default:'0'},
+    owner:{type:String,default:''},
+    inserttime:{type:String,default:Date.now},
+    items:[{ type: mongoose.Schema.Types.ObjectId, ref: 'repairitem' }],
+    entershoptime:{type:String,default:''},
+    state:{type:String,default:'0'},//维修状态:0维修中 1待结账 2已完成 3已取消
+    wantedcompletedtime:{type:String,default:''},//预计提车时间
+    customremark:{type:String,default:''},//客户留言备注
+    iswatiinginshop:{type:String,default:'0'},//是否一直在店等待
+    contactid:{type:String,default:''},//是否一直在店等待
 });
+
 
 // mongoose.model(Setting.ModelNameContact,ContactSchema)
 //特别注意 **** 这些modelname在创建数据库表时的名字会自动增加s,并且都是小写。

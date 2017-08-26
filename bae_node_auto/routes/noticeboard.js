@@ -1,6 +1,9 @@
 /**
  * Created by points on 16/12/15.
  */
+
+"use strict";
+
 var express = require('express');
 var router = express.Router();
 var Setting = require('../utils/config');
@@ -27,15 +30,24 @@ router.get('/android',function (req,res,next) {
 
     NoticeBoard.findOne({os:'android'},function (err,ret) {
         if(err){
-            res.render('noticeboard', { value:{'notice':'暂无数据!'}  ,layout: 'noticeboard'});
+            res.render('noticeboard2', { value:{'notice':'暂无数据!'}  ,layout: 'noticeboard2'});
         }else {
             if(ret){
-                res.render('noticeboard', { value: ret.notice ,layout: 'noticeboard'});
+                res.render('noticeboard2', { value: ret.notice ,layout: 'noticeboard2'});
             }else {
-                res.render('noticeboard', { value:'暂无数据!'  ,layout: 'noticeboard'});
+                res.render('noticeboard2', { value:'暂无数据!'  ,layout: 'noticeboard2'});
             }
         }
     });
+});
+
+
+router.get('/order',function (req,res,next) {
+    res.render('customerorder', { openid:'24d773423y32r3',layout: 'customerorder'});
+});
+
+router.get('/test1',function (req,res,next) {
+    res.send('1');
 });
 
 

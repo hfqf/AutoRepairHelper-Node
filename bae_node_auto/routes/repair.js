@@ -10,7 +10,9 @@ var mongoose = require('mongoose');
 
 var Repair = mongoose.model(global.config.ModelNameRepairHistory);
 var Item = mongoose.model(global.config.ModelNameRepairItem);
-
+var Contact = mongoose.model(global.config.ModelNameContact);
+var WXPusher = require('../weixin/pushtowxuser');
+var User = mongoose.model(global.config.mongooseModelName);
 
         /**
          * 增加记录2.0
@@ -59,7 +61,7 @@ var Item = mongoose.model(global.config.ModelNameRepairItem);
                     circle:req.body.circle,
                     isreaded:req.body.isreaded == undefined ? '0' : req.body.isreaded,
                     owner:req.body.owner == undefined ? '' : req.body.owner,
-                    inserttime:req.body.inserttime == undefined ? new Date().Format('yyyy-MM-dd hh:mm:ss') : req.body.inserttime,
+                    inserttime:new Date().Format('yyyy-MM-dd hh:mm:ss'),
                     items:req.body.items
                 });
                 newRepair.save(function (err,doc) {
@@ -150,11 +152,11 @@ var Item = mongoose.model(global.config.ModelNameRepairItem);
                     repairetime:req.body.repairetime,
                     repairtype:req.body.repairtype,
                     addition:req.body.addition,
-                    tipcircle:req.body.tipcircle,
+                    tipcircle:req.body.tipcircle == undefined ? '':req.body.tipcircle,
                     isclose:req.body.isclose,
                     circle:req.body.circle,
                     isreaded:req.body.isreaded == undefined ? '0' : req.body.isreaded,
-                    items:req.body.items
+                    items:req.body.items,
                 }};
                 var options    = {upsert : false};
                 Repair.update(conditions,update,options,function (err,ret) {
@@ -372,4 +374,320 @@ var Item = mongoose.model(global.config.ModelNameRepairItem);
 
             });
 
-module.exports = router;
+
+/**
+ * 增加记录3.2
+ */
+router.post('/add4',function (req, res, next) {
+    global.log4bae('repair/add4'+JSON.stringify(req.body));
+    var newRepair = new  Repair({
+        id:req.body.id,
+        carcode:req.body.carcode,
+        totalkm:req.body.totalkm,
+        repairetime:req.body.repairetime,
+        repairtype:req.body.repairtype,
+        addition:req.body.addition,
+        tipcircle:req.body.tipcircle == undefined ? '0' : req.body.tipcircle,
+        isclose:req.body.isclose,
+        circle:req.body.circle,
+        isreaded:req.body.isreaded == undefined ? '0' : req.body.isreaded,
+        owner:req.body.owner == undefined ? '' : req.body.owner,
+        inserttime:new Date().Format('yyyy-MM-dd hh:mm:ss'),
+        items:req.body.items,
+        contactid:req.body.contactid,
+        wantedcompletedtime:req.body.wantedcompletedtime,
+        customremark:req.body.customremark,
+        iswatiinginshop:req.body.iswatiinginshop,
+        entershoptime:req.body.entershoptime
+    });
+    newRepair.save(function (err,doc) {
+        if(err){
+            return res.send(global.retFormate(0,err,'存入数据失败'));
+        }
+        else {
+            return res.send(global.retFormate(1,doc,'存入数据成功'));
+        }
+    });
+
+}),
+
+
+
+    /**
+     *更新记录
+     **/
+    router.post('/update4',function (req, res, next) {
+        global.log4bae('repair/update'+JSON.stringify(req.body));
+        var conditions = {_id : req.body.id,owner:req.body.owner,};
+        var update     = {$set : {
+            contactid:req.body.contactid,
+            carcode:req.body.carcode,
+            totalkm:req.body.totalkm,
+            repairetime:req.body.repairetime,
+            repairtype:req.body.repairtype,
+            addition:req.body.addition,
+            tipcircle:req.body.tipcircle == undefined ? '':req.body.tipcircle,
+            isclose:req.body.isclose,
+            circle:req.body.circle,
+            isreaded:req.body.isreaded == undefined ? '0' : req.body.isreaded,
+            items:req.body.items,
+            state:req.body.state,
+            wantedcompletedtime:req.body.wantedcompletedtime == undefined ?'':req.body.wantedcompletedtime,
+            customremark:req.body.customremark == undefined?'':req.body.customremark,
+            iswatiinginshop:req.body.iswatiinginshop == undefined?'0':req.body.iswatiinginshop,
+            entershoptime:req.body.entershoptime == undefined ?'':req.body.entershoptime
+        }};
+        var options    = {upsert : false};
+        Repair.findOne(conditions,function (err,doc1) {
+            if(err){
+
+            }else {
+
+                var oldState =  doc1.state;
+                Repair.update(conditions,update,options,function (err,ret) {
+                    if(err){
+                        return res.send(global.retFormate(0,err,'修改数据失败'));
+                    }
+                    else {
+                         //开单后第一次在state为0时update ，或及其他状态修改(不为0)
+                            var  isUpdateForState0First =  oldState == 0 && req.body.state == oldState && req.body.repairtype.length >0;
+                            var  isUpdateExcepteState0 =  req.body.state != 0 && req.body.repairtype.length >0;
+                        if(isUpdateForState0First || isUpdateExcepteState0){
+                            //查询当前用户是否已经绑定，发送微信提醒
+
+
+                            Contact.findOne(  {$or: [
+                                    {_id:req.body.contactid,owner:req.body.owner},
+                                    {carcode:req.body.carcode,owner:req.body.owner}]
+                            },function (err,ret) {
+                                if(err){
+
+                                }else {
+                                    if(ret != null){
+                                        if(ret.isbindweixin == '1'){
+                                            // (openId,tel,repairId,repairer,repairContent,carCode,state,shopName,callback) {
+                                            //查找相关门店信息
+                                            User.findOne({tel:ret.owner},function (err,ret1) {
+
+                                                if(err){
+
+                                                }else {
+                                                    WXPusher.pushRepairSateTemplate(ret.weixinopenid,ret.tel,ret._id,ret1.username,
+                                                        req.body.repairtype,req.body.carcode,req.body.state,ret1.shopname,function (err,ret2) {
+
+                                                        });
+
+                                                }
+
+                                            })
+
+
+                                        }
+                                    }
+
+                                }
+
+                            });
+                        }
+
+                        return res.send(global.retFormate(1,'修改成功','修改数据成功'));
+                    }
+                });
+
+            }
+
+        });
+
+
+    }),
+
+
+    /**
+     * 查询某种状态的所有记录
+     **/
+    router.post('/queryAllWithState',function (req, res, next) {
+        global.log4bae('repair/queryAllWithState'+JSON.stringify(req.body));
+        var page =  req.body.page == undefined ? 0 :parseInt(req.body.page);
+        var pagesize =  req.body.pagesize == undefined ? 20 :parseInt(req.body.pagesize);
+        var conditions =  req.body.contactid == undefined ?
+                        {owner:req.body.owner,
+                          state:req.body.state,
+                        }:
+                 /*
+                  *为了兼容老版本的数据,除了contactid，其它字段都可以默认为空,导致老版本的数据升级后contactid没有，所以搜素时需要带入contactid和carcode
+                  *
+                  */
+                          {$or:[
+                              {owner:req.body.owner,
+                               state:req.body.state,
+                               contactid:req.body.contactid,},
+                              {owner:req.body.owner,
+                                  state:req.body.state,
+                                  carcode:req.body.carcode,}
+                            ]};
+        Repair.find(conditions).sort({'_id':-1}).populate('items').limit(pagesize).skip(pagesize*page).exec(function (err,ret) {
+            if(err){
+                return res.send(global.retFormate(0,err,'查询数据失败'));
+            }
+            else {
+                var arrNew = new  Array();
+                for(var i=0;i<ret.length;i++){
+                    var rep = ret[i];
+                    if(rep.entershoptime.length == 0){
+                        rep.entershoptime = rep.inserttime;
+                    }
+                    arrNew.push(rep);
+                }
+                return res.send(global.retFormate(1,arrNew,'查询数据成功'));
+            }
+        });
+
+    }),
+
+    /**
+     * 取消工单
+     **/
+    router.post('/cancel',function (req, res, next) {
+        global.log4bae('repair/cancel'+JSON.stringify(req.body));
+        var conditions = {owner:req.body.owner,
+                        _id : req.body.id
+                        };
+        var update     = {$set : {
+                state:'3'
+            }};
+        var options    = {upsert : false};
+        Repair.update(conditions,update,options,function (err,ret) {
+            if(err){
+                return res.send(global.retFormate(0,err,'修改数据失败'));
+            }
+            else {
+                return res.send(global.retFormate(1,'修改成功','修改数据成功'));
+            }
+        });
+
+    }),
+
+    /**
+     * 恢复工单
+     **/
+    router.post('/revert',function (req, res, next) {
+        global.log4bae('repair/revert'+JSON.stringify(req.body));
+        var conditions = {owner:req.body.owner,
+            _id : req.body.id
+        };
+        var update     = {$set : {
+            state:'0'
+        }};
+        var options    = {upsert : false};
+        Repair.update(conditions,update,options,function (err,ret) {
+            if(err){
+                return res.send(global.retFormate(0,err,'修改数据失败'));
+            }
+            else {
+                return res.send(global.retFormate(1,'修改成功','修改数据成功'));
+            }
+        });
+
+    }),
+
+
+    /**
+     * 修改工单状态
+     **/
+    router.post('/updateState',function (req, res, next) {
+        global.log4bae('repair/updateState'+JSON.stringify(req.body));
+        var conditions = {owner:req.body.owner,
+            _id : req.body.id
+        };
+        var update     = {$set : {
+            state:req.body.state
+        }};
+        var options    = {upsert : false};
+        Repair.update(conditions,update,options,function (err,ret) {
+            if(err){
+                return res.send(global.retFormate(0,err,'修改数据失败'));
+            }
+            else {
+                return res.send(global.retFormate(1,'修改成功','修改数据成功'));
+            }
+        });
+
+    }),
+
+
+    /**
+     * 删除当个客户的所有维修记录
+     * */
+    router.post('/delAll3',function (req, res, next) {
+        global.log4bae('repair/delAll3'+JSON.stringify(req.body));
+        Repair.remove({$or:[
+                            {carcode:req.body.carcode,owner:req.body.owner},
+                            {contactid:req.body.contactid,owner:req.body.owner}]
+    },function (err,ret) {
+            if(err){
+                return res.send(global.retFormate(0,err,'删除数据失败'));
+            }
+            else {
+                return res.send(global.retFormate(1,'删除成功','删除成功'));
+            }
+        });
+
+    }),
+
+    /**
+     * 查询某个用户的所有记录
+     **/
+    router.post('/queryOneAll3',function (req, res, next) {
+        global.log4bae('repair/queryOneAll3'+JSON.stringify(req.body));
+        var conditions = {$or:[
+            {carcode:req.body.carcode,owner:req.body.owner},
+            {contactid:req.body.contactid,owner:req.body.owner}]
+        }
+        Repair.find(conditions).sort({'_id':-1}).populate('items').exec(function (err,ret) {
+            if(err){
+                return res.send(global.retFormate(0,err,'查询数据失败'));
+            }
+            else {
+                var arrNew = new  Array();
+                for(var i=0;i<ret.length;i++){
+                    var rep = ret[i];
+                    if(rep.entershoptime.length == 0){
+                        rep.entershoptime = rep.inserttime;
+                    }
+                    arrNew.push(rep);
+                }
+                return res.send(global.retFormate(1,arrNew,'查询数据成功'));
+            }
+        });
+
+    }),
+
+
+    /**
+     * 查询所有记录3.2
+     **/
+    router.post('/queryAllTiped1',function (req, res, next) {
+        global.log4bae('repair/queryAllTiped1'+JSON.stringify(req.body));
+        var now = new Date().Format("yyyy-MM-dd");
+        var conditions = {owner:req.body.owner,
+            isclose : '0',
+            tipcircle:{'$lte':now}};
+
+        Repair.find(conditions).
+        sort({'_id':-1}).
+        populate('items').
+        exec(function (err,ret) {
+            if(err){
+                return res.send(global.retFormate(0,err,'查询数据失败'));
+            }
+            else {
+                return res.send(global.retFormate(1,ret,'查询数据成功'));
+            }
+        });
+
+    }),
+
+
+
+
+    module.exports = router;

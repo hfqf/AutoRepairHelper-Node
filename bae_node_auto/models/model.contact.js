@@ -11,6 +11,13 @@ var ContactSchema = new mongoose.Schema({
     cartype:String,
     owner:String,
     id:String,
+
+    inserttime:{type:String,default:Date.now},
+    isbindweixin:{type:String,default:'0'},//是否已经绑定微信
+    weixinopenid:{type:String,default:''},//绑定的微信openid
+    vin:{type:String,default:''},//车架号
+    carregistertime:{type:String,default:''},//注册时间,推算出年审时间
+    headurl:{type:String,default:''},//头像
 });
 
 // mongoose.model(Setting.ModelNameContact,ContactSchema)
